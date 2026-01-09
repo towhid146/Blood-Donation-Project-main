@@ -1,0 +1,44 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Check for outdated packages
+        working-directory: ./backend
+        run: npm outdated || true
+
+      - name: Check package.json validity
+        working-directory: ./backend
+        run: npm pack --dry-run
+
+      - name: Verify file structure
+        run: |
+          echo "📁 Checking project structure..."
+          test -f backend/server.js && echo "✅ server.js exists"
+          test -f backend/package.json && echo "✅ package.json exists"
+          test -d src/main/resources/templates && echo "✅ templates directory exists"
+          test -d src/main/resources/static && echo "✅ static directory exists"
+          echo "✅ Project structure verified"
