@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "src/main/resources/static/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "src/main/resources/templates/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/getUserStatus",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "src/main/resources/static/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "src/main/resources/static/js/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "src/main/resources/static/images/$1"
+    },
+    {
+      "src": "/(login|signUp|profile|aboutUsPage|donorListPage|donorTablePage|formPage)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/homePage",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "backend/server.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
