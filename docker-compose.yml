@@ -1,0 +1,59 @@
+services:
+  # Node.js Backend Application
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bdms-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/blood_donation_db
+      - SESSION_SECRET=your-super-secret-session-key-change-in-production
+    depends_on:
+      - mongo
+    volumes:
+      # Mount static files and templates for development
+      - ./src/main/resources/static:/app/../src/main/resources/static:ro
+      - ./src/main/resources/templates:/app/../src/main/resources/templates:ro
+    networks:
+      - bdms-network
+
+  # MongoDB Database
+  mongo:
+    image: mongo:7
+    container_name: bdms-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - bdms-network
+
+  # MongoDB Express (Web-based MongoDB admin interface) - Optional
+  mongo-express:
+    image: mongo-express:latest
+    container_name: bdms-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+    depends_on:
+      - mongo
+    networks:
+      - bdms-network
+
+networks:
+  bdms-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

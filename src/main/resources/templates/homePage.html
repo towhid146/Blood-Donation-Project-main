@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BloodLink - Donate Blood, Save Lives</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="/js/api.js"></script>
+    <script src="/js/navbar.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .hero-pattern {
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .blood-drop {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Navbar -->
+    <nav
+      class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo -->
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >Blood<span class="text-red-600">Link</span></span
+            >
+          </a>
+
+          <!-- Desktop Nav -->
+          <div id="navbar" class="hidden md:flex items-center space-x-6">
+            <!-- Dynamic links -->
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <button id="menu-btn" class="md:hidden p-2 text-gray-600">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t px-4 py-4 space-y-3"
+      >
+        <a
+          href="/donorListPage"
+          class="block py-2 text-gray-700 hover:text-red-600"
+          >Find Donors</a
+        >
+        <a href="/formPage" class="block py-2 text-gray-700 hover:text-red-600"
+          >Request Blood</a
+        >
+        <a href="/login" class="block py-2 text-gray-700 hover:text-red-600"
+          >Login</a
+        >
+        <a
+          href="/signUp"
+          class="block py-2 px-4 bg-red-600 text-white rounded-lg text-center"
+          >Sign Up</a
+        >
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-pattern min-h-screen flex items-center pt-16">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-20">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <!-- Left: Content -->
+          <div>
+            <div
+              class="inline-flex items-center px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full mb-6"
+            >
+              <span
+                class="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"
+              ></span>
+              1 donation = 3 lives saved
+            </div>
+
+            <h1
+              class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6"
+            >
+              Give the gift of
+              <span class="text-red-600 block">life today</span>
+            </h1>
+
+            <p class="text-lg text-gray-600 mb-8 max-w-md">
+              Connect with blood donors in your area. Simple, fast, and
+              life-saving. Every drop matters.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 mb-12">
+              <a
+                href="/signUp"
+                class="inline-flex items-center justify-center px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition shadow-lg shadow-red-200"
+              >
+                <i class="fas fa-plus mr-2"></i>
+                Become a Donor
+              </a>
+              <a
+                href="/formPage"
+                class="inline-flex items-center justify-center px-6 py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-lg hover:border-red-600 hover:text-red-600 transition"
+              >
+                <i class="fas fa-search mr-2"></i>
+                Need Blood?
+              </a>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="flex gap-8">
+              <div>
+                <div class="text-3xl font-bold text-gray-900" id="stat-donors">
+                  0
+                </div>
+                <div class="text-sm text-gray-500">Donors</div>
+              </div>
+              <div class="w-px bg-gray-200"></div>
+              <div>
+                <div class="text-3xl font-bold text-gray-900" id="stat-lives">
+                  0
+                </div>
+                <div class="text-sm text-gray-500">Lives Saved</div>
+              </div>
+              <div class="w-px bg-gray-200"></div>
+              <div>
+                <div class="text-3xl font-bold text-gray-900">24/7</div>
+                <div class="text-sm text-gray-500">Available</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Visual -->
+          <div class="hidden lg:block relative">
+            <div
+              class="absolute -top-10 -right-10 w-72 h-72 bg-red-100 rounded-full opacity-50 blur-3xl"
+            ></div>
+            <div
+              class="relative bg-white rounded-3xl shadow-2xl p-8 border border-gray-100"
+            >
+              <!-- Blood Types Grid -->
+              <div class="text-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Blood Type Availability
+                </h3>
+                <p class="text-sm text-gray-500">Current donor distribution</p>
+              </div>
+              <div class="grid grid-cols-4 gap-3">
+                <div
+                  class="bg-red-50 rounded-xl p-4 text-center hover:bg-red-100 transition cursor-pointer"
+                >
+                  <div class="text-xl font-bold text-red-600">A+</div>
+                  <div class="text-xs text-gray-500 mt-1">35%</div>
+                </div>
+                <div
+                  class="bg-red-50 rounded-xl p-4 text-center hover:bg-red-100 transition cursor-pointer"
+                >
+                  <div class="text-xl font-bold text-red-600">B+</div>
+                  <div class="text-xs text-gray-500 mt-1">8%</div>
+                </div>
+                <div
+                  class="bg-red-50 rounded-xl p-4 text-center hover:bg-red-100 transition cursor-pointer"
+                >
+                  <div class="text-xl font-bold text-red-600">O+</div>
+                  <div class="text-xs text-gray-500 mt-1">38%</div>
+                </div>
+                <div
+                  class="bg-red-50 rounded-xl p-4 text-center hover:bg-red-100 transition cursor-pointer"
+                >
+                  <div class="text-xl font-bold text-red-600">AB+</div>
+                  <div class="text-xs text-gray-500 mt-1">3%</div>
+                </div>
+                <div
+                  class="bg-gray-50 rounded-xl p-4 text-center hover:bg-gray-100 transition cursor-pointer"
+                >
+                  <div class="text-xl font-bold text-gray-700">A-</div>
+                  <div class="text-xs text-gray-500 mt-1">6%</div>
+                </div>
+                <div
+                  class="bg-gray-50 rounded-xl p-4 text-center hover:bg-gray-100 transition cursor-pointer"
+                >
+                  <div class="text-xl font-bold text-gray-700">B-</div>
+                  <div class="text-xs text-gray-500 mt-1">2%</div>
+                </div>
+                <div
+                  class="bg-yellow-50 rounded-xl p-4 text-center hover:bg-yellow-100 transition cursor-pointer border-2 border-yellow-200"
+                >
+                  <div class="text-xl font-bold text-yellow-700">O-</div>
+                  <div class="text-xs text-yellow-600 mt-1">Universal</div>
+                </div>
+                <div
+                  class="bg-gray-50 rounded-xl p-4 text-center hover:bg-gray-100 transition cursor-pointer"
+                >
+                  <div class="text-xl font-bold text-gray-700">AB-</div>
+                  <div class="text-xs text-gray-500 mt-1">1%</div>
+                </div>
+              </div>
+              <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-gray-600">O- can donate to anyone</span>
+                  <span class="text-red-600 font-medium">Learn more →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">How it works</h2>
+          <p class="text-gray-600 max-w-xl mx-auto">
+            Three simple steps to save a life or find a donor
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Step 1 -->
+          <div
+            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition"
+          >
+            <div
+              class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-6"
+            >
+              <span class="text-red-600 font-bold text-xl">1</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">
+              Create Account
+            </h3>
+            <p class="text-gray-600">
+              Sign up in less than 2 minutes with your basic information and
+              blood type.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div
+            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition"
+          >
+            <div
+              class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-6"
+            >
+              <span class="text-red-600 font-bold text-xl">2</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">
+              Find or Request
+            </h3>
+            <p class="text-gray-600">
+              Browse available donors nearby or submit a blood request for your
+              needs.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div
+            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition"
+          >
+            <div
+              class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-6"
+            >
+              <span class="text-red-600 font-bold text-xl">3</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">Save Lives</h3>
+            <p class="text-gray-600">
+              Connect with donors or recipients and make a life-saving
+              difference.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="py-20">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Donate Card -->
+          <a
+            href="/signUp"
+            class="group bg-red-600 rounded-2xl p-8 text-white hover:bg-red-700 transition"
+          >
+            <div class="flex items-start justify-between">
+              <div>
+                <h3 class="text-2xl font-bold mb-2">I want to donate</h3>
+                <p class="text-red-100 mb-6">
+                  Register as a donor and help save lives in your community.
+                </p>
+                <span class="inline-flex items-center text-white font-medium">
+                  Get started
+                  <i
+                    class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition"
+                  ></i>
+                </span>
+              </div>
+              <div
+                class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center"
+              >
+                <i class="fas fa-hand-holding-heart text-3xl"></i>
+              </div>
+            </div>
+          </a>
+
+          <!-- Request Card -->
+          <a
+            href="/formPage"
+            class="group bg-gray-900 rounded-2xl p-8 text-white hover:bg-gray-800 transition"
+          >
+            <div class="flex items-start justify-between">
+              <div>
+                <h3 class="text-2xl font-bold mb-2">I need blood</h3>
+                <p class="text-gray-400 mb-6">
+                  Submit a request and we'll connect you with matching donors.
+                </p>
+                <span class="inline-flex items-center text-white font-medium">
+                  Request now
+                  <i
+                    class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition"
+                  ></i>
+                </span>
+              </div>
+              <div
+                class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center"
+              >
+                <i class="fas fa-tint text-3xl"></i>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Requests -->
+    <section class="py-20 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center mb-10">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-900">Active Requests</h2>
+            <p class="text-gray-600 mt-1">People who need blood right now</p>
+          </div>
+          <a
+            href="/donorListPage"
+            class="text-red-600 font-medium hover:text-red-700"
+          >
+            View all <i class="fas fa-arrow-right ml-1"></i>
+          </a>
+        </div>
+
+        <div id="recent-requests" class="grid md:grid-cols-3 gap-6">
+          <!-- Loading -->
+          <div class="col-span-full text-center py-12 text-gray-500">
+            <i class="fas fa-spinner fa-spin text-2xl mb-3"></i>
+            <p>Loading requests...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        <div class="blood-drop mx-auto mb-8"></div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          Ready to make a difference?
+        </h2>
+        <p class="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
+          Join thousands of donors who are saving lives every day. Your blood
+          type is someone's hope.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/signUp"
+            class="inline-flex items-center justify-center px-8 py-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition shadow-lg"
+          >
+            <i class="fas fa-heart mr-2"></i>
+            Join as Donor
+          </a>
+          <a
+            href="/login"
+            class="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-200 text-gray-700 font-semibold rounded-lg hover:border-gray-300 transition"
+          >
+            <i class="fas fa-sign-in-alt mr-2"></i>
+            Sign In
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="grid md:grid-cols-4 gap-8 mb-8">
+          <div class="md:col-span-2">
+            <div class="flex items-center space-x-2 mb-4">
+              <div class="blood-drop w-6 h-8"></div>
+              <span class="text-xl font-bold"
+                >Blood<span class="text-red-500">Link</span></span
+              >
+            </div>
+            <p class="text-gray-400 max-w-sm">
+              Connecting blood donors with those in need. Simple, fast,
+              life-saving.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Quick Links</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li>
+                <a href="/signUp" class="hover:text-white transition"
+                  >Become a Donor</a
+                >
+              </li>
+              <li>
+                <a href="/formPage" class="hover:text-white transition"
+                  >Request Blood</a
+                >
+              </li>
+              <li>
+                <a href="/donorListPage" class="hover:text-white transition"
+                  >Find Donors</a
+                >
+              </li>
+              <li>
+                <a href="/aboutUsPage" class="hover:text-white transition"
+                  >About Us</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Contact</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><i class="fas fa-envelope mr-2"></i>help@bloodlink.com</li>
+              <li><i class="fas fa-phone mr-2"></i>+880 123 456 789</li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm"
+        >
+          <p>© 2024 BloodLink. Made with ❤️ by CUET CSE Students</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+
+      // Load data
+      document.addEventListener("DOMContentLoaded", async () => {
+        await loadStats();
+        await loadRequests();
+      });
+
+      async function loadStats() {
+        try {
+          const donors = await api.getAllDonors();
+          const count = donors.length || 0;
+          document.getElementById("stat-donors").textContent = count;
+          document.getElementById("stat-lives").textContent = count * 3;
+        } catch (e) {
+          document.getElementById("stat-donors").textContent = "0";
+          document.getElementById("stat-lives").textContent = "0";
+        }
+      }
+
+      async function loadRequests() {
+        const container = document.getElementById("recent-requests");
+        try {
+          const requests = await api.getPendingRequests();
+
+          if (!requests || requests.length === 0) {
+            container.innerHTML = `
+            <div class="col-span-full bg-white rounded-2xl p-12 text-center border border-gray-100">
+              <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-green-600 text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">All caught up!</h3>
+              <p class="text-gray-500">No pending blood requests at the moment.</p>
+            </div>
+          `;
+            return;
+          }
+
+          container.innerHTML = requests
+            .slice(0, 3)
+            .map(
+              (req) => `
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center">
+                <span class="text-red-600 font-bold text-xl">${
+                  req.bloodGroupNeeded
+                }</span>
+              </div>
+              <span class="px-3 py-1 text-xs font-medium rounded-full ${
+                req.urgency === "critical"
+                  ? "bg-red-100 text-red-700"
+                  : req.urgency === "high"
+                  ? "bg-orange-100 text-orange-700"
+                  : "bg-gray-100 text-gray-700"
+              }">
+                ${req.urgency || "Normal"}
+              </span>
+            </div>
+            <h4 class="font-semibold text-gray-900 mb-1">${
+              req.medicalPurpose || "Blood Required"
+            }</h4>
+            <p class="text-sm text-gray-500 mb-4">${
+              req.volumeNeeded || 450
+            }ml needed</p>
+            <a href="/login" class="text-red-600 font-medium text-sm hover:text-red-700">
+              Help now <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+        `
+            )
+            .join("");
+        } catch (e) {
+          container.innerHTML = `
+          <div class="col-span-full bg-white rounded-2xl p-12 text-center border border-gray-100">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-check text-green-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">All caught up!</h3>
+            <p class="text-gray-500">No pending blood requests at the moment.</p>
+          </div>
+        `;
+        }
+      }
+    </script>
+  </body>
+</html>

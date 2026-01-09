@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us - BloodLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="/js/api.js"></script>
+    <script src="/js/navbar.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .blood-drop {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Navbar -->
+    <nav
+      class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center h-16">
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >Blood<span class="text-red-600">Link</span></span
+            >
+          </a>
+
+          <div id="navbar" class="hidden md:flex items-center space-x-6"></div>
+
+          <button id="menu-btn" class="md:hidden p-2 text-gray-600">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t px-4 py-4 space-y-3"
+      >
+        <a
+          href="/donorListPage"
+          class="block py-2 text-gray-700 hover:text-red-600"
+          >Find Donors</a
+        >
+        <a href="/formPage" class="block py-2 text-gray-700 hover:text-red-600"
+          >Request Blood</a
+        >
+        <a href="/login" class="block py-2 text-gray-700 hover:text-red-600"
+          >Login</a
+        >
+        <a
+          href="/signUp"
+          class="block py-2 px-4 bg-red-600 text-white rounded-lg text-center"
+          >Sign Up</a
+        >
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-12 bg-gradient-to-br from-red-500 to-red-600">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <div
+          class="inline-flex items-center px-3 py-1 bg-white/20 text-white text-sm font-medium rounded-full mb-6"
+        >
+          <i class="fas fa-users mr-2"></i>
+          Meet Our Team
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">About Us</h1>
+        <p class="text-xl text-red-100 max-w-2xl mx-auto">
+          The passionate team behind BloodLink - dedicated to connecting donors
+          with those in need.
+        </p>
+      </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="grid md:grid-cols-3 gap-8">
+          <div
+            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center"
+          >
+            <div
+              class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-bullseye text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Our Mission</h3>
+            <p class="text-gray-600">
+              To bridge the gap between blood donors and recipients through
+              technology, making blood donation accessible and efficient.
+            </p>
+          </div>
+          <div
+            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center"
+          >
+            <div
+              class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-eye text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Our Vision</h3>
+            <p class="text-gray-600">
+              A world where no one loses their life due to lack of blood
+              availability. Every donation counts, every life matters.
+            </p>
+          </div>
+          <div
+            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center"
+          >
+            <div
+              class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-heart text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Our Values</h3>
+            <p class="text-gray-600">
+              Compassion, transparency, and commitment to saving lives drive
+              everything we do at BloodLink.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-16">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-12">
+          <span
+            class="text-red-600 font-semibold text-sm uppercase tracking-wider"
+            >Our Team</span
+          >
+          <h2 class="text-3xl font-bold text-gray-900 mt-2">
+            Meet the Creators
+          </h2>
+          <p class="text-gray-500 mt-3 max-w-lg mx-auto">
+            Students from CUET CSE Department working together to make a
+            difference
+          </p>
+        </div>
+
+        <!-- Team Grid -->
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Team Member 1 -->
+          <div
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-lg transition"
+          >
+            <div class="relative overflow-hidden">
+              <img
+                src="/images/Tanjim/Tanjim (3).jpg"
+                alt="Tanjim Haider"
+                class="w-full h-64 object-cover group-hover:scale-105 transition duration-300"
+                onerror="this.src='https://via.placeholder.com/400x300?text=TH'"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+              ></div>
+              <div class="absolute bottom-4 left-4 text-white">
+                <h3 class="text-xl font-bold">Tanjim Haider</h3>
+                <p class="text-white/80 text-sm">CUET CSE</p>
+              </div>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                A passionate computer science student with expertise in
+                full-stack web development. Committed to using technology to
+                make a positive impact on healthcare and community services.
+              </p>
+              <div class="flex items-center space-x-4">
+                <a
+                  href="mailto:tanjim@example.com"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fas fa-envelope"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team Member 2 -->
+          <div
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-lg transition"
+          >
+            <div class="relative overflow-hidden">
+              <img
+                src="/images/Tanjim/rizvi (1).png"
+                alt="Towhidul Islam"
+                class="w-full h-64 object-cover group-hover:scale-105 transition duration-300"
+                onerror="this.src='https://via.placeholder.com/400x300?text=TI'"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+              ></div>
+              <div class="absolute bottom-4 left-4 text-white">
+                <h3 class="text-xl font-bold">Towhidul Islam</h3>
+                <p class="text-white/80 text-sm">CUET CSE</p>
+              </div>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                Dedicated software developer focused on creating user-friendly
+                applications. Believes in the power of technology to connect
+                people and save lives through efficient healthcare solutions.
+              </p>
+              <div class="flex items-center space-x-4">
+                <a
+                  href="mailto:towhidul@example.com"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fas fa-envelope"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team Member 3 -->
+          <div
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-lg transition"
+          >
+            <div class="relative overflow-hidden">
+              <img
+                src="/images/Tanjim/Adil (2).jpeg"
+                alt="Adil Mubassar"
+                class="w-full h-64 object-cover group-hover:scale-105 transition duration-300"
+                onerror="this.src='https://via.placeholder.com/400x300?text=AM'"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+              ></div>
+              <div class="absolute bottom-4 left-4 text-white">
+                <h3 class="text-xl font-bold">Adil Mubassar</h3>
+                <p class="text-white/80 text-sm">CUET CSE</p>
+              </div>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                Enthusiastic developer with a keen interest in building
+                impactful applications. Strives to create solutions that make a
+                real difference in people's lives through innovation.
+              </p>
+              <div class="flex items-center space-x-4">
+                <a
+                  href="mailto:adil@example.com"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fas fa-envelope"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition"
+                >
+                  <i class="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12"
+        >
+          <div class="grid md:grid-cols-2 gap-12">
+            <div>
+              <span
+                class="text-red-600 font-semibold text-sm uppercase tracking-wider"
+                >Contact Us</span
+              >
+              <h2 class="text-3xl font-bold text-gray-900 mt-2 mb-4">
+                Get in Touch
+              </h2>
+              <p class="text-gray-600 mb-8">
+                Have questions or feedback? We'd love to hear from you. Reach
+                out to us through any of the channels below.
+              </p>
+
+              <div class="space-y-4">
+                <div class="flex items-center space-x-4">
+                  <div
+                    class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center"
+                  >
+                    <i class="fas fa-envelope text-red-600"></i>
+                  </div>
+                  <div>
+                    <p class="text-gray-500 text-sm">Email</p>
+                    <p class="text-gray-900 font-medium">
+                      contact@bloodlink.com
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                  <div
+                    class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center"
+                  >
+                    <i class="fas fa-phone text-red-600"></i>
+                  </div>
+                  <div>
+                    <p class="text-gray-500 text-sm">Phone</p>
+                    <p class="text-gray-900 font-medium">+880 123 456 789</p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                  <div
+                    class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center"
+                  >
+                    <i class="fas fa-map-marker-alt text-red-600"></i>
+                  </div>
+                  <div>
+                    <p class="text-gray-500 text-sm">Location</p>
+                    <p class="text-gray-900 font-medium">
+                      CUET, Chittagong, Bangladesh
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <form class="space-y-5">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Your Name</label
+                  >
+                  <input
+                    type="text"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                    placeholder="Enter your name"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Email Address</label
+                  >
+                  <input
+                    type="email"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Message</label
+                  >
+                  <textarea
+                    rows="4"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition resize-none"
+                    placeholder="Your message..."
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center"
+                >
+                  <i class="fas fa-paper-plane mr-2"></i>
+                  Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="grid md:grid-cols-4 gap-8 mb-8">
+          <div class="md:col-span-2">
+            <div class="flex items-center space-x-2 mb-4">
+              <div class="blood-drop w-8 h-10"></div>
+              <span class="text-xl font-bold"
+                >Blood<span class="text-red-400">Link</span></span
+              >
+            </div>
+            <p class="text-gray-400 max-w-sm">
+              Connecting blood donors with those in need. Every drop counts,
+              every life matters.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Quick Links</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li>
+                <a href="/homePage" class="hover:text-white transition">Home</a>
+              </li>
+              <li>
+                <a href="/donorListPage" class="hover:text-white transition"
+                  >Find Donors</a
+                >
+              </li>
+              <li>
+                <a href="/formPage" class="hover:text-white transition"
+                  >Request Blood</a
+                >
+              </li>
+              <li>
+                <a href="/aboutUsPage" class="hover:text-white transition"
+                  >About Us</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Follow Us</h4>
+            <div class="flex space-x-3">
+              <a
+                href="#"
+                class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition"
+              >
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition"
+              >
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
+          <p>© 2024 BloodLink. Made with ❤️ by CUET CSE Students</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+    </script>
+  </body>
+</html>

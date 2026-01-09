@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up - BloodLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/navbar.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .hero-pattern {
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .blood-drop {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Navbar -->
+    <nav
+      class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center h-16">
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >Blood<span class="text-red-600">Link</span></span
+            >
+          </a>
+
+          <div id="navbar" class="hidden md:flex items-center space-x-6"></div>
+
+          <button id="menu-btn" class="md:hidden p-2 text-gray-600">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t px-4 py-4 space-y-3"
+      >
+        <a
+          href="/donorListPage"
+          class="block py-2 text-gray-700 hover:text-red-600"
+          >Find Donors</a
+        >
+        <a href="/formPage" class="block py-2 text-gray-700 hover:text-red-600"
+          >Request Blood</a
+        >
+        <a href="/login" class="block py-2 text-gray-700 hover:text-red-600"
+          >Login</a
+        >
+        <a
+          href="/signUp"
+          class="block py-2 px-4 bg-red-600 text-white rounded-lg text-center"
+          >Sign Up</a
+        >
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="hero-pattern min-h-screen pt-20 pb-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="grid lg:grid-cols-5 gap-12">
+          <!-- Left: Info Section -->
+          <div class="lg:col-span-2 hidden lg:flex flex-col justify-center">
+            <div
+              class="inline-flex items-center px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full mb-6 w-fit"
+            >
+              <i class="fas fa-heart mr-2"></i>
+              Join Our Community
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 leading-tight mb-6">
+              Become a lifesaver.<br />
+              <span class="text-red-600">Register today.</span>
+            </h1>
+            <p class="text-lg text-gray-600 leading-relaxed mb-8">
+              Join thousands of donors making a difference. Your registration
+              takes just minutes, but your impact lasts a lifetime.
+            </p>
+
+            <!-- Benefits -->
+            <div class="space-y-4">
+              <div class="flex items-start space-x-3">
+                <div
+                  class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-check text-red-600 text-sm"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">
+                    Track Your Donations
+                  </h4>
+                  <p class="text-gray-500 text-sm">
+                    Keep a record of all your life-saving contributions
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <div
+                  class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-check text-red-600 text-sm"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">
+                    Get Notified Instantly
+                  </h4>
+                  <p class="text-gray-500 text-sm">
+                    Receive alerts when someone nearby needs your blood type
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <div
+                  class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                >
+                  <i class="fas fa-check text-red-600 text-sm"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">Join a Community</h4>
+                  <p class="text-gray-500 text-sm">
+                    Connect with other donors and share your journey
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Sign Up Form -->
+          <div class="lg:col-span-3">
+            <div
+              class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8"
+            >
+              <div class="text-center mb-8">
+                <div class="lg:hidden blood-drop w-12 h-16 mx-auto mb-4"></div>
+                <h2 class="text-2xl font-bold text-gray-900">Create Account</h2>
+                <p class="text-gray-500 mt-2">
+                  Fill in your details to get started
+                </p>
+              </div>
+
+              <form id="signupForm" class="space-y-5">
+                <div class="grid md:grid-cols-2 gap-5">
+                  <!-- Username -->
+                  <div>
+                    <label
+                      for="username"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Username *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-user"></i>
+                      </span>
+                      <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                        placeholder="Choose a username"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Email -->
+                  <div>
+                    <label
+                      for="email"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Email *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-envelope"></i>
+                      </span>
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5">
+                  <!-- First Name -->
+                  <div>
+                    <label
+                      for="firstName"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >First Name *</label
+                    >
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      required
+                      class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                      placeholder="First name"
+                    />
+                  </div>
+
+                  <!-- Last Name -->
+                  <div>
+                    <label
+                      for="lastName"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Last Name *</label
+                    >
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      required
+                      class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                      placeholder="Last name"
+                    />
+                  </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5">
+                  <!-- Mobile Number -->
+                  <div>
+                    <label
+                      for="number"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Mobile Number *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-phone"></i>
+                      </span>
+                      <input
+                        id="number"
+                        name="number"
+                        type="tel"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                        placeholder="Phone number"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Blood Type -->
+                  <div>
+                    <label
+                      for="bloodType"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Blood Type *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-tint"></i>
+                      </span>
+                      <select
+                        id="bloodType"
+                        name="bloodType"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white"
+                      >
+                        <option value="" disabled selected>
+                          Select blood type
+                        </option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5">
+                  <!-- Gender -->
+                  <div>
+                    <label
+                      for="gender"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Gender *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-venus-mars"></i>
+                      </span>
+                      <select
+                        id="gender"
+                        name="gender"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white"
+                      >
+                        <option value="" disabled selected>
+                          Select gender
+                        </option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Age -->
+                  <div>
+                    <label
+                      for="age"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Age *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-birthday-cake"></i>
+                      </span>
+                      <input
+                        id="age"
+                        name="age"
+                        type="number"
+                        min="18"
+                        max="65"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                        placeholder="Your age"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- City -->
+                <div>
+                  <label
+                    for="city"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >City *</label
+                  >
+                  <div class="relative">
+                    <span
+                      class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                    >
+                      <i class="fas fa-map-marker-alt"></i>
+                    </span>
+                    <input
+                      id="city"
+                      name="city"
+                      type="text"
+                      required
+                      class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                      placeholder="Your city"
+                    />
+                  </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5">
+                  <!-- Password -->
+                  <div>
+                    <label
+                      for="password"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Password *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-lock"></i>
+                      </span>
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                        placeholder="Create password"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Confirm Password -->
+                  <div>
+                    <label
+                      for="confirmPassword"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Confirm Password *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-lock"></i>
+                      </span>
+                      <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                        placeholder="Confirm password"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Terms -->
+                <div class="flex items-start">
+                  <input
+                    id="terms"
+                    type="checkbox"
+                    required
+                    class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 mt-1"
+                  />
+                  <label for="terms" class="ml-3 text-sm text-gray-600">
+                    I agree to the
+                    <a href="#" class="text-red-600 hover:text-red-700"
+                      >Terms of Service</a
+                    >
+                    and
+                    <a href="#" class="text-red-600 hover:text-red-700"
+                      >Privacy Policy</a
+                    >
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center"
+                >
+                  <i class="fas fa-user-plus mr-2"></i>
+                  Create Account
+                </button>
+              </form>
+
+              <div class="mt-6 text-center">
+                <p class="text-gray-600">
+                  Already have an account?
+                  <a
+                    href="/login"
+                    class="font-semibold text-red-600 hover:text-red-700"
+                    >Sign in</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <p class="text-gray-400">
+          © 2024 BloodLink. Made with ❤️ by CUET CSE Students
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+    </script>
+  </body>
+</html>

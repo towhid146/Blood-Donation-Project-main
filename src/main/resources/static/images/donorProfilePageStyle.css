@@ -1,0 +1,48 @@
+/* General Body Style */
+body {
+    background: #e0e5ec;
+    font-family: Arial, sans-serif;
+}
+
+/* Neumorphism Styles */
+.neumorphic {
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 9px 9px 16px #b8bec5, -9px -9px 16px #ffffff;
+}
+
+.neumorphic-card {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Progress Bar Styles */
+.progress-circle {
+    transform: rotate(-90deg);
+}
+
+.progress-bg {
+    fill: none;
+    stroke: #d1d9e6;
+    stroke-width: 12;
+}
+
+.progress-bar {
+    fill: none;
+    stroke: #ff6b6b;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s;
+}
+
+.percentage-text {
+    position: absolute;
+    font-size: 18px;
+    font-weight: bold;
+    color: #3d3d3d;
+}

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donor Table - BloodLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="/js/api.js"></script>
+    <script src="/js/navbar.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .blood-drop {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav
+      class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center h-16">
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >Blood<span class="text-red-600">Link</span></span
+            >
+          </a>
+
+          <div id="navbar" class="hidden md:flex items-center space-x-6"></div>
+
+          <button id="menu-btn" class="md:hidden p-2 text-gray-600">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t px-4 py-4 space-y-3"
+      >
+        <a
+          href="/donorListPage"
+          class="block py-2 text-gray-700 hover:text-red-600"
+          >Find Donors</a
+        >
+        <a href="/formPage" class="block py-2 text-gray-700 hover:text-red-600"
+          >Request Blood</a
+        >
+        <a href="/login" class="block py-2 text-gray-700 hover:text-red-600"
+          >Login</a
+        >
+        <a
+          href="/signUp"
+          class="block py-2 px-4 bg-red-600 text-white rounded-lg text-center"
+          >Sign Up</a
+        >
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <!-- Header -->
+        <div class="text-center py-8">
+          <div
+            class="inline-flex items-center px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full mb-4"
+          >
+            <i class="fas fa-table mr-2"></i>
+            Data View
+          </div>
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            Donor Table
+          </h1>
+          <p class="text-gray-500 max-w-lg mx-auto">
+            View and manage all registered blood donors in a comprehensive table
+            format.
+          </p>
+        </div>
+
+        <!-- Filters and Actions -->
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8"
+        >
+          <div class="grid md:grid-cols-4 gap-4">
+            <div class="md:col-span-2">
+              <div class="relative">
+                <span
+                  class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                >
+                  <i class="fas fa-search"></i>
+                </span>
+                <input
+                  type="text"
+                  id="search"
+                  placeholder="Search by name or blood group..."
+                  class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                />
+              </div>
+            </div>
+            <div>
+              <div class="relative">
+                <span
+                  class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                >
+                  <i class="fas fa-tint"></i>
+                </span>
+                <select
+                  id="blood-filter"
+                  class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white"
+                >
+                  <option value="">All Blood Types</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button
+                id="export-btn"
+                class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition flex items-center justify-center"
+              >
+                <i class="fas fa-file-export mr-2"></i>Export
+              </button>
+              <button
+                id="refresh-btn"
+                class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition"
+              >
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div id="loading" class="text-center py-16">
+          <i class="fas fa-spinner fa-spin text-red-500 text-4xl mb-4"></i>
+          <p class="text-gray-500">Loading donors...</p>
+        </div>
+
+        <!-- Data Table -->
+        <div
+          id="table-container"
+          class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden"
+        >
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Donor Name
+                  </th>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Blood Group
+                  </th>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Location
+                  </th>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Last Donated
+                  </th>
+                  <th
+                    class="py-4 px-6 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="py-4 px-6 text-center text-sm font-semibold text-gray-900"
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="table-body" class="divide-y divide-gray-100">
+                <!-- Table rows will be populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div
+            class="flex flex-col md:flex-row justify-between items-center p-6 border-t border-gray-100 bg-gray-50"
+          >
+            <div
+              id="pagination-info"
+              class="text-gray-600 text-sm mb-4 md:mb-0"
+            >
+              Showing 0 of 0
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                id="prev-btn"
+                class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                <i class="fas fa-chevron-left mr-1"></i>Prev
+              </button>
+              <span id="page-numbers" class="flex gap-1">
+                <!-- Page numbers will be populated by JavaScript -->
+              </span>
+              <button
+                id="next-btn"
+                class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                Next<i class="fas fa-chevron-right ml-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- No results message -->
+        <div id="no-results" class="hidden text-center py-16">
+          <div
+            class="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-inbox text-gray-400 text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            No donors found
+          </h3>
+          <p class="text-gray-500">Try adjusting your search criteria.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <p class="text-gray-400">
+          © 2024 BloodLink. Made with ❤️ by CUET CSE Students
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      let allDonors = [];
+      let filteredDonors = [];
+      let currentPage = 1;
+      const itemsPerPage = 10;
+
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        await loadDonors();
+        setupEventListeners();
+      });
+
+      async function loadDonors() {
+        const loading = document.getElementById("loading");
+        const tableContainer = document.getElementById("table-container");
+        const noResults = document.getElementById("no-results");
+
+        try {
+          allDonors = await api.getAllDonors();
+          filteredDonors = [...allDonors];
+          loading.classList.add("hidden");
+
+          if (allDonors.length === 0) {
+            noResults.classList.remove("hidden");
+          } else {
+            tableContainer.classList.remove("hidden");
+            renderTable();
+          }
+        } catch (error) {
+          loading.innerHTML =
+            '<p class="text-red-500">Failed to load donors. Please try again later.</p>';
+        }
+      }
+
+      function renderTable() {
+        const tableBody = document.getElementById("table-body");
+        const noResults = document.getElementById("no-results");
+        const tableContainer = document.getElementById("table-container");
+
+        if (filteredDonors.length === 0) {
+          tableContainer.classList.add("hidden");
+          noResults.classList.remove("hidden");
+          return;
+        }
+
+        noResults.classList.add("hidden");
+        tableContainer.classList.remove("hidden");
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(
+          startIndex + itemsPerPage,
+          filteredDonors.length
+        );
+        const pageData = filteredDonors.slice(startIndex, endIndex);
+
+        tableBody.innerHTML = pageData
+          .map(
+            (donor) => `
+          <tr class="hover:bg-gray-50 transition">
+            <td class="py-4 px-6">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center">
+                  <i class="fas fa-user text-red-500"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900">${donor.username}</p>
+                  <p class="text-sm text-gray-500">${donor.email || "N/A"}</p>
+                </div>
+              </div>
+            </td>
+            <td class="py-4 px-6">
+              <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-600 text-sm font-semibold rounded-full">
+                <i class="fas fa-tint mr-1 text-xs"></i>${
+                  donor.bloodGroup || "N/A"
+                }
+              </span>
+            </td>
+            <td class="py-4 px-6 text-gray-600">
+              <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>${
+                donor.city || "Not specified"
+              }
+            </td>
+            <td class="py-4 px-6 text-gray-600">
+              ${
+                donor.lastDonationDate
+                  ? new Date(donor.lastDonationDate).toLocaleDateString()
+                  : "Never"
+              }
+            </td>
+            <td class="py-4 px-6">
+              <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-600 text-sm font-medium rounded-full">
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>Available
+              </span>
+            </td>
+            <td class="py-4 px-6 text-center">
+              <button 
+                class="request-btn px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition"
+                data-donor-id="${donor._id}"
+              >
+                Request
+              </button>
+            </td>
+          </tr>
+        `
+          )
+          .join("");
+
+        updatePagination();
+
+        // Add click handlers
+        document.querySelectorAll(".request-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            this.classList.remove("bg-red-600", "hover:bg-red-700");
+            this.classList.add("bg-green-600");
+            this.innerHTML = '<i class="fas fa-check mr-1"></i>Sent';
+            this.disabled = true;
+          });
+        });
+      }
+
+      function updatePagination() {
+        const totalPages = Math.ceil(filteredDonors.length / itemsPerPage);
+        const paginationInfo = document.getElementById("pagination-info");
+        const pageNumbers = document.getElementById("page-numbers");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+
+        const startIndex = (currentPage - 1) * itemsPerPage + 1;
+        const endIndex = Math.min(
+          currentPage * itemsPerPage,
+          filteredDonors.length
+        );
+
+        paginationInfo.textContent = `Showing ${startIndex}-${endIndex} of ${filteredDonors.length}`;
+
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+
+        // Generate page numbers
+        pageNumbers.innerHTML = "";
+        for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+          const btn = document.createElement("button");
+          btn.className = `w-10 h-10 rounded-xl transition ${
+            i === currentPage
+              ? "bg-red-600 text-white"
+              : "border border-gray-200 hover:bg-gray-100"
+          }`;
+          btn.textContent = i;
+          btn.addEventListener("click", () => {
+            currentPage = i;
+            renderTable();
+          });
+          pageNumbers.appendChild(btn);
+        }
+      }
+
+      function setupEventListeners() {
+        const searchInput = document.getElementById("search");
+        const bloodFilter = document.getElementById("blood-filter");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const refreshBtn = document.getElementById("refresh-btn");
+        const exportBtn = document.getElementById("export-btn");
+
+        searchInput.addEventListener("input", filterDonors);
+        bloodFilter.addEventListener("change", filterDonors);
+
+        prevBtn.addEventListener("click", () => {
+          if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+          }
+        });
+
+        nextBtn.addEventListener("click", () => {
+          const totalPages = Math.ceil(filteredDonors.length / itemsPerPage);
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+          }
+        });
+
+        refreshBtn.addEventListener("click", async () => {
+          refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+          await loadDonors();
+          refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+        });
+
+        exportBtn.addEventListener("click", exportData);
+      }
+
+      function filterDonors() {
+        const searchTerm = document
+          .getElementById("search")
+          .value.toLowerCase();
+        const bloodGroup = document.getElementById("blood-filter").value;
+
+        filteredDonors = allDonors.filter((donor) => {
+          const matchesSearch =
+            (donor.username &&
+              donor.username.toLowerCase().includes(searchTerm)) ||
+            (donor.bloodGroup &&
+              donor.bloodGroup.toLowerCase().includes(searchTerm));
+          const matchesBlood = !bloodGroup || donor.bloodGroup === bloodGroup;
+          return matchesSearch && matchesBlood;
+        });
+
+        currentPage = 1;
+        renderTable();
+      }
+
+      function exportData() {
+        const csvContent = [
+          ["Name", "Email", "Blood Group", "Location", "Last Donated"],
+          ...filteredDonors.map((d) => [
+            d.username,
+            d.email || "N/A",
+            d.bloodGroup || "N/A",
+            d.city || "N/A",
+            d.lastDonationDate
+              ? new Date(d.lastDonationDate).toLocaleDateString()
+              : "Never",
+          ]),
+        ]
+          .map((row) => row.join(","))
+          .join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "donors.csv";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    </script>
+  </body>
+</html>

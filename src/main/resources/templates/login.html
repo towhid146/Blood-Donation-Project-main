@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - BloodLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/navbar.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .hero-pattern {
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .blood-drop {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Navbar -->
+    <nav
+      class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center h-16">
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >Blood<span class="text-red-600">Link</span></span
+            >
+          </a>
+
+          <div id="navbar" class="hidden md:flex items-center space-x-6"></div>
+
+          <button id="menu-btn" class="md:hidden p-2 text-gray-600">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t px-4 py-4 space-y-3"
+      >
+        <a
+          href="/donorListPage"
+          class="block py-2 text-gray-700 hover:text-red-600"
+          >Find Donors</a
+        >
+        <a href="/formPage" class="block py-2 text-gray-700 hover:text-red-600"
+          >Request Blood</a
+        >
+        <a href="/login" class="block py-2 text-gray-700 hover:text-red-600"
+          >Login</a
+        >
+        <a
+          href="/signUp"
+          class="block py-2 px-4 bg-red-600 text-white rounded-lg text-center"
+          >Sign Up</a
+        >
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="hero-pattern min-h-screen flex items-center pt-16">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <!-- Left: Welcome Section -->
+          <div class="hidden lg:block">
+            <div
+              class="inline-flex items-center px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full mb-6"
+            >
+              <i class="fas fa-heart mr-2"></i>
+              Welcome Back
+            </div>
+            <h1
+              class="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-6"
+            >
+              Every drop counts.<br />
+              <span class="text-red-600">Login to save lives.</span>
+            </h1>
+            <p class="text-xl text-gray-600 leading-relaxed mb-8">
+              Access your donor profile, track your donation history, and
+              respond to blood requests in your area.
+            </p>
+
+            <!-- Stats -->
+            <div class="flex items-center space-x-8">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900">10K+</div>
+                <div class="text-gray-500 text-sm">Active Donors</div>
+              </div>
+              <div class="w-px h-12 bg-gray-200"></div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900">30K+</div>
+                <div class="text-gray-500 text-sm">Lives Saved</div>
+              </div>
+              <div class="w-px h-12 bg-gray-200"></div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-gray-900">24/7</div>
+                <div class="text-gray-500 text-sm">Support</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Login Form -->
+          <div class="w-full max-w-md mx-auto">
+            <div
+              class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8"
+            >
+              <div class="text-center mb-8">
+                <div class="lg:hidden blood-drop w-12 h-16 mx-auto mb-4"></div>
+                <h2 class="text-2xl font-bold text-gray-900">Sign In</h2>
+                <p class="text-gray-500 mt-2">
+                  Enter your credentials to continue
+                </p>
+              </div>
+
+              <form id="loginForm" class="space-y-5">
+                <div>
+                  <label
+                    for="username"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Username</label
+                  >
+                  <div class="relative">
+                    <span
+                      class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                    >
+                      <i class="fas fa-user"></i>
+                    </span>
+                    <input
+                      id="username"
+                      name="username"
+                      type="text"
+                      required
+                      class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                      placeholder="Enter your username"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    for="password"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Password</label
+                  >
+                  <div class="relative">
+                    <span
+                      class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                    >
+                      <i class="fas fa-lock"></i>
+                    </span>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      required
+                      class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                      placeholder="Enter your password"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                    />
+                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                  </label>
+                  <a
+                    href="#"
+                    class="text-sm font-medium text-red-600 hover:text-red-700"
+                    >Forgot password?</a
+                  >
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center"
+                >
+                  <i class="fas fa-sign-in-alt mr-2"></i>
+                  Sign In
+                </button>
+              </form>
+
+              <div class="mt-8">
+                <div class="relative">
+                  <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200"></div>
+                  </div>
+                  <div class="relative flex justify-center text-sm">
+                    <span class="px-4 bg-white text-gray-500"
+                      >New to BloodLink?</span
+                    >
+                  </div>
+                </div>
+
+                <a
+                  href="/signUp"
+                  class="mt-6 w-full flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-700 font-medium hover:border-red-300 hover:text-red-600 transition"
+                >
+                  <i class="fas fa-user-plus mr-2"></i>
+                  Create an Account
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <p class="text-gray-400">
+          © 2024 BloodLink. Made with ❤️ by CUET CSE Students
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+    </script>
+  </body>
+</html>

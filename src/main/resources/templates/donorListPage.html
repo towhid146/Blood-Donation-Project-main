@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Donors - BloodLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="/js/api.js"></script>
+    <script src="/js/navbar.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .blood-drop {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav
+      class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center h-16">
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >Blood<span class="text-red-600">Link</span></span
+            >
+          </a>
+
+          <div id="navbar" class="hidden md:flex items-center space-x-6"></div>
+
+          <button id="menu-btn" class="md:hidden p-2 text-gray-600">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t px-4 py-4 space-y-3"
+      >
+        <a
+          href="/donorListPage"
+          class="block py-2 text-gray-700 hover:text-red-600"
+          >Find Donors</a
+        >
+        <a href="/formPage" class="block py-2 text-gray-700 hover:text-red-600"
+          >Request Blood</a
+        >
+        <a href="/login" class="block py-2 text-gray-700 hover:text-red-600"
+          >Login</a
+        >
+        <a
+          href="/signUp"
+          class="block py-2 px-4 bg-red-600 text-white rounded-lg text-center"
+          >Sign Up</a
+        >
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <!-- Header -->
+        <div class="text-center py-8">
+          <div
+            class="inline-flex items-center px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full mb-4"
+          >
+            <i class="fas fa-search mr-2"></i>
+            Find Help
+          </div>
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            Available Donors
+          </h1>
+          <p class="text-gray-500 max-w-lg mx-auto">
+            Browse through our list of registered blood donors and find the help
+            you need.
+          </p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8"
+        >
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+              <div class="relative">
+                <span
+                  class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                >
+                  <i class="fas fa-search"></i>
+                </span>
+                <input
+                  type="text"
+                  id="search-bar"
+                  placeholder="Search by name or location..."
+                  class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                />
+              </div>
+            </div>
+            <div>
+              <div class="relative">
+                <span
+                  class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                >
+                  <i class="fas fa-tint"></i>
+                </span>
+                <select
+                  id="filter-blood-group"
+                  class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white"
+                >
+                  <option value="">All Blood Groups</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Request All Button -->
+          <div class="mt-4 flex justify-end">
+            <button
+              id="request-all-btn"
+              class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition flex items-center"
+            >
+              <i class="fas fa-paper-plane mr-2"></i>
+              Request All Filtered
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div id="loading" class="text-center py-16">
+          <i class="fas fa-spinner fa-spin text-red-500 text-4xl mb-4"></i>
+          <p class="text-gray-500">Loading donors...</p>
+        </div>
+
+        <!-- Donor Cards Grid -->
+        <div
+          id="donor-list"
+          class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"
+        >
+          <!-- Donor cards will be populated by JavaScript -->
+        </div>
+
+        <!-- No results message -->
+        <div id="no-results" class="hidden text-center py-16">
+          <div
+            class="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-search text-gray-400 text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            No donors found
+          </h3>
+          <p class="text-gray-500">Try adjusting your search criteria.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <p class="text-gray-400">
+          © 2024 BloodLink. Made with ❤️ by CUET CSE Students
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      let allDonors = [];
+
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        await loadDonors();
+        setupEventListeners();
+      });
+
+      async function loadDonors() {
+        const loading = document.getElementById("loading");
+        const donorList = document.getElementById("donor-list");
+        const noResults = document.getElementById("no-results");
+
+        try {
+          allDonors = await api.getAllDonors();
+          loading.classList.add("hidden");
+
+          if (allDonors.length === 0) {
+            noResults.classList.remove("hidden");
+          } else {
+            renderDonors(allDonors);
+            donorList.classList.remove("hidden");
+          }
+        } catch (error) {
+          loading.innerHTML =
+            '<p class="text-red-500">Failed to load donors. Please try again later.</p>';
+        }
+      }
+
+      function renderDonors(donors) {
+        const donorList = document.getElementById("donor-list");
+        const noResults = document.getElementById("no-results");
+
+        if (donors.length === 0) {
+          donorList.classList.add("hidden");
+          noResults.classList.remove("hidden");
+          return;
+        }
+
+        noResults.classList.add("hidden");
+        donorList.classList.remove("hidden");
+
+        donorList.innerHTML = donors
+          .map(
+            (donor) => `
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-red-100 transition duration-300" data-donor-id="${
+            donor._id
+          }">
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center">
+                <i class="fas fa-user text-red-500 text-xl"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-gray-900">${
+                  donor.username
+                }</h3>
+                <span class="inline-flex items-center px-2 py-0.5 bg-red-100 text-red-600 text-sm font-semibold rounded-full">
+                  <i class="fas fa-tint mr-1 text-xs"></i>${
+                    donor.bloodGroup || "N/A"
+                  }
+                </span>
+              </div>
+            </div>
+            
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center text-gray-600 text-sm">
+                <i class="fas fa-map-marker-alt w-5 text-gray-400"></i>
+                <span>${donor.city || "Not specified"}</span>
+              </div>
+              <div class="flex items-center text-gray-600 text-sm">
+                <i class="fas fa-venus-mars w-5 text-gray-400"></i>
+                <span>${donor.gender || "N/A"}</span>
+              </div>
+              ${
+                donor.lastDonationDate
+                  ? `<div class="flex items-center text-gray-600 text-sm">
+                      <i class="fas fa-calendar w-5 text-gray-400"></i>
+                      <span>Last donated: ${new Date(
+                        donor.lastDonationDate
+                      ).toLocaleDateString()}</span>
+                    </div>`
+                  : ""
+              }
+            </div>
+            
+            <button 
+              class="request-btn w-full py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition flex items-center justify-center"
+              data-donor-id="${donor._id}"
+            >
+              <i class="fas fa-paper-plane mr-2"></i>
+              Request Donation
+            </button>
+          </div>
+        `
+          )
+          .join("");
+
+        // Add click handlers
+        document.querySelectorAll(".request-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            markAsRequested(this);
+          });
+        });
+      }
+
+      function setupEventListeners() {
+        const searchBar = document.getElementById("search-bar");
+        const bloodFilter = document.getElementById("filter-blood-group");
+        const requestAllBtn = document.getElementById("request-all-btn");
+
+        searchBar.addEventListener("input", filterDonors);
+        bloodFilter.addEventListener("change", filterDonors);
+        requestAllBtn.addEventListener("click", requestAll);
+      }
+
+      function filterDonors() {
+        const searchTerm = document
+          .getElementById("search-bar")
+          .value.toLowerCase();
+        const bloodGroup = document.getElementById("filter-blood-group").value;
+
+        const filtered = allDonors.filter((donor) => {
+          const matchesSearch =
+            (donor.username &&
+              donor.username.toLowerCase().includes(searchTerm)) ||
+            (donor.city && donor.city.toLowerCase().includes(searchTerm));
+          const matchesBlood = !bloodGroup || donor.bloodGroup === bloodGroup;
+          return matchesSearch && matchesBlood;
+        });
+
+        renderDonors(filtered);
+      }
+
+      function markAsRequested(button) {
+        button.classList.remove("bg-red-600", "hover:bg-red-700");
+        button.classList.add("bg-green-600", "hover:bg-green-700");
+        button.innerHTML = '<i class="fas fa-check mr-2"></i>Requested';
+        button.disabled = true;
+      }
+
+      function requestAll() {
+        document
+          .querySelectorAll(".request-btn:not(:disabled)")
+          .forEach((btn) => {
+            markAsRequested(btn);
+          });
+      }
+    </script>
+  </body>
+</html>
