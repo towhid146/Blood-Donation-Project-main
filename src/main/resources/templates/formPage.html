@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Request Blood - BloodLink</title>
+    <title>Request Blood - BDMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -49,7 +49,7 @@
           <a href="/homePage" class="flex items-center space-x-2">
             <div class="blood-drop w-8 h-10"></div>
             <span class="text-xl font-bold text-gray-900"
-              >Blood<span class="text-red-600">Link</span></span
+              >BD<span class="text-red-600">MS</span></span
             >
           </a>
 
@@ -201,55 +201,37 @@
                 <div class="grid md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <label class="text-gray-500">Name</label>
-                    <p
-                      class="text-gray-900 font-medium"
-                      id="userInfoName"
-                    >
+                    <p class="text-gray-900 font-medium" id="userInfoName">
                       --
                     </p>
                   </div>
                   <div>
                     <label class="text-gray-500">Blood Type</label>
-                    <p
-                      class="text-gray-900 font-medium"
-                      id="userInfoBloodType"
-                    >
+                    <p class="text-gray-900 font-medium" id="userInfoBloodType">
                       --
                     </p>
                   </div>
                   <div>
                     <label class="text-gray-500">Phone</label>
-                    <p
-                      class="text-gray-900 font-medium"
-                      id="userInfoPhone"
-                    >
+                    <p class="text-gray-900 font-medium" id="userInfoPhone">
                       --
                     </p>
                   </div>
                   <div>
                     <label class="text-gray-500">Location</label>
-                    <p
-                      class="text-gray-900 font-medium"
-                      id="userInfoLocation"
-                    >
+                    <p class="text-gray-900 font-medium" id="userInfoLocation">
                       --
                     </p>
                   </div>
                   <div>
                     <label class="text-gray-500">Email</label>
-                    <p
-                      class="text-gray-900 font-medium"
-                      id="userInfoEmail"
-                    >
+                    <p class="text-gray-900 font-medium" id="userInfoEmail">
                       --
                     </p>
                   </div>
                   <div>
                     <label class="text-gray-500">Gender</label>
-                    <p
-                      class="text-gray-900 font-medium"
-                      id="userInfoGender"
-                    >
+                    <p class="text-gray-900 font-medium" id="userInfoGender">
                       --
                     </p>
                   </div>
@@ -533,7 +515,7 @@
     <footer class="bg-gray-900 text-white py-8">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
         <p class="text-gray-400">
-          © 2024 BloodLink. Made with ❤️ by CUET CSE Students
+          © 2024 BDMS. Made with ❤️ by CUET CSE Students
         </p>
       </div>
     </footer>
@@ -550,24 +532,28 @@
           if (data.user) {
             const user = data.user;
             const section = document.getElementById("user-info-section");
-            
+
             // Show section
             section.classList.remove("hidden");
-            
+
             // Populate fields
-            document.getElementById("userInfoName").textContent = 
+            document.getElementById("userInfoName").textContent =
               `${user.firstName || ""} ${user.lastName || ""}`.trim() || "--";
-            document.getElementById("userInfoBloodType").textContent = 
+            document.getElementById("userInfoBloodType").textContent =
               user.bloodType || "--";
-            document.getElementById("userInfoPhone").textContent = 
+            document.getElementById("userInfoPhone").textContent =
               user.number || "--";
-            document.getElementById("userInfoLocation").textContent = 
-              user.location || [user.upazila, user.district, user.division].filter(Boolean).join(", ") || "--";
-            document.getElementById("userInfoEmail").textContent = 
+            document.getElementById("userInfoLocation").textContent =
+              user.location ||
+              [user.upazila, user.district, user.division]
+                .filter(Boolean)
+                .join(", ") ||
+              "--";
+            document.getElementById("userInfoEmail").textContent =
               user.email || "--";
-            document.getElementById("userInfoGender").textContent = 
+            document.getElementById("userInfoGender").textContent =
               user.gender || "--";
-            
+
             // Pre-fill contact fields
             if (user.number) {
               document.getElementById("contactNumber").value = user.number;
@@ -576,8 +562,9 @@
               document.getElementById("email").value = user.email;
             }
             if (user.location || user.district) {
-              document.getElementById("location").value = 
-                user.location || [user.upazila, user.district].filter(Boolean).join(", ");
+              document.getElementById("location").value =
+                user.location ||
+                [user.upazila, user.district].filter(Boolean).join(", ");
             }
           }
         } catch (error) {
@@ -585,7 +572,7 @@
           document.getElementById("user-info-section").classList.add("hidden");
         }
       }
-      
+
       // Load user info on page load
       loadUserInfo();
 

@@ -27,7 +27,7 @@ function injectNavbar() {
         <div class="flex justify-between items-center h-16">
           <a href="/homePage" class="flex items-center space-x-2">
             <div class="blood-drop w-8 h-10"></div>
-            <span class="text-xl font-bold text-gray-900">Blood<span class="text-red-600">Link</span></span>
+            <span class="text-xl font-bold text-gray-900">BD<span class="text-red-600">MS</span></span>
           </a>
 
           <div id="navbar" class="hidden md:flex items-center space-x-6"></div>
