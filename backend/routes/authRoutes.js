@@ -71,7 +71,7 @@ router.post("/signup", signupValidation, async (req, res) => {
     // Generate location string from division/district/upazila if provided
     let finalLocation = location;
     if (!finalLocation && (division || district || upazila)) {
-      finalLocation = [upazila, district, division].filter(Boolean).join(', ');
+      finalLocation = [upazila, district, division].filter(Boolean).join(", ");
     }
 
     // Create new user
@@ -83,10 +83,10 @@ router.post("/signup", signupValidation, async (req, res) => {
       lastName,
       bloodType,
       number,
-      location: finalLocation || '',
-      division: division || '',
-      district: district || '',
-      upazila: upazila || '',
+      location: finalLocation || "",
+      division: division || "",
+      district: district || "",
+      upazila: upazila || "",
       gender,
       age,
     });
