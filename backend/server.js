@@ -6,6 +6,9 @@ const passport = require("passport");
 const path = require("path");
 require("dotenv").config();
 
+// App version for deployment tracking
+const APP_VERSION = "1.1.0"; // Updated: Edit profile functionality
+
 // Import routes
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
