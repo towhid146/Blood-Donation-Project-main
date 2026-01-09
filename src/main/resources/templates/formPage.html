@@ -181,6 +181,81 @@
               <!-- Error/Success Messages -->
               <div id="form-message" class="hidden mb-6 p-4 rounded-xl"></div>
 
+              <!-- Your Information (for logged in users) -->
+              <div
+                id="user-info-section"
+                class="hidden mb-6 bg-gray-50 rounded-xl p-5 border border-gray-200"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-user-circle text-red-500 mr-2"></i>
+                    Your Information
+                  </h4>
+                  <a
+                    href="/profile"
+                    class="text-sm text-red-600 hover:text-red-700 flex items-center"
+                  >
+                    <i class="fas fa-pen mr-1"></i>Edit Profile
+                  </a>
+                </div>
+                <div class="grid md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <label class="text-gray-500">Name</label>
+                    <p
+                      class="text-gray-900 font-medium"
+                      id="userInfoName"
+                    >
+                      --
+                    </p>
+                  </div>
+                  <div>
+                    <label class="text-gray-500">Blood Type</label>
+                    <p
+                      class="text-gray-900 font-medium"
+                      id="userInfoBloodType"
+                    >
+                      --
+                    </p>
+                  </div>
+                  <div>
+                    <label class="text-gray-500">Phone</label>
+                    <p
+                      class="text-gray-900 font-medium"
+                      id="userInfoPhone"
+                    >
+                      --
+                    </p>
+                  </div>
+                  <div>
+                    <label class="text-gray-500">Location</label>
+                    <p
+                      class="text-gray-900 font-medium"
+                      id="userInfoLocation"
+                    >
+                      --
+                    </p>
+                  </div>
+                  <div>
+                    <label class="text-gray-500">Email</label>
+                    <p
+                      class="text-gray-900 font-medium"
+                      id="userInfoEmail"
+                    >
+                      --
+                    </p>
+                  </div>
+                  <div>
+                    <label class="text-gray-500">Gender</label>
+                    <p
+                      class="text-gray-900 font-medium"
+                      id="userInfoGender"
+                    >
+                      --
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <form id="blood-request-form" class="space-y-5">
                 <div class="grid md:grid-cols-2 gap-5">
                   <!-- Blood Type -->
@@ -467,6 +542,52 @@
       document.getElementById("menu-btn").addEventListener("click", () => {
         document.getElementById("mobile-menu").classList.toggle("hidden");
       });
+
+      // Load user info if logged in
+      async function loadUserInfo() {
+        try {
+          const data = await api.getProfile();
+          if (data.user) {
+            const user = data.user;
+            const section = document.getElementById("user-info-section");
+            
+            // Show section
+            section.classList.remove("hidden");
+            
+            // Populate fields
+            document.getElementById("userInfoName").textContent = 
+              `${user.firstName || ""} ${user.lastName || ""}`.trim() || "--";
+            document.getElementById("userInfoBloodType").textContent = 
+              user.bloodType || "--";
+            document.getElementById("userInfoPhone").textContent = 
+              user.number || "--";
+            document.getElementById("userInfoLocation").textContent = 
+              user.location || [user.upazila, user.district, user.division].filter(Boolean).join(", ") || "--";
+            document.getElementById("userInfoEmail").textContent = 
+              user.email || "--";
+            document.getElementById("userInfoGender").textContent = 
+              user.gender || "--";
+            
+            // Pre-fill contact fields
+            if (user.number) {
+              document.getElementById("contactNumber").value = user.number;
+            }
+            if (user.email) {
+              document.getElementById("email").value = user.email;
+            }
+            if (user.location || user.district) {
+              document.getElementById("location").value = 
+                user.location || [user.upazila, user.district].filter(Boolean).join(", ");
+            }
+          }
+        } catch (error) {
+          // Not logged in, hide user info section
+          document.getElementById("user-info-section").classList.add("hidden");
+        }
+      }
+      
+      // Load user info on page load
+      loadUserInfo();
 
       document
         .getElementById("blood-request-form")
