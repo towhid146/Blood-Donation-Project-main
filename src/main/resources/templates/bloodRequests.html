@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blood Requests - BDMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="/js/api.js"></script>
+    <script src="/js/navbar.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .hero-pattern {
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .blood-drop {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+      .urgency-critical {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        border-left: 4px solid #dc2626;
+      }
+      .urgency-high {
+        background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        border-left: 4px solid #f59e0b;
+      }
+      .urgency-normal {
+        background: linear-gradient(135deg, #fefce8, #fef9c3);
+        border-left: 4px solid #eab308;
+      }
+      .urgency-low {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        border-left: 4px solid #22c55e;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Navbar -->
+    <nav
+      class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center h-16">
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >BD<span class="text-red-600">MS</span></span
+            >
+          </a>
+
+          <div id="navbar" class="hidden md:flex items-center space-x-6"></div>
+
+          <button id="menu-btn" class="md:hidden p-2 text-gray-600">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t px-4 py-4 space-y-3"
+      ></div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="hero-pattern min-h-screen pt-20 pb-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <!-- Header -->
+        <div class="mb-8">
+          <div
+            class="inline-flex items-center px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full mb-4"
+          >
+            <i class="fas fa-bell mr-2"></i>
+            Blood Requests Near You
+          </div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Help Save Lives</h1>
+          <p class="text-gray-600">
+            These patients in your area need blood donors. Respond to requests
+            you can help with.
+          </p>
+        </div>
+
+        <!-- Eligibility Alert -->
+        <div
+          id="eligibility-alert"
+          class="hidden mb-6 p-4 rounded-xl border"
+        ></div>
+
+        <!-- Filter Tabs -->
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button
+            onclick="filterRequests('all')"
+            class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white"
+            data-filter="all"
+          >
+            All Requests
+          </button>
+          <button
+            onclick="filterRequests('critical')"
+            class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
+            data-filter="critical"
+          >
+            🔴 Critical
+          </button>
+          <button
+            onclick="filterRequests('high')"
+            class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
+            data-filter="high"
+          >
+            🟠 High
+          </button>
+          <button
+            onclick="filterRequests('normal')"
+            class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
+            data-filter="normal"
+          >
+            🟡 Normal
+          </button>
+          <button
+            onclick="filterRequests('responded')"
+            class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
+            data-filter="responded"
+          >
+            ✓ Responded
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-12">
+          <i class="fas fa-spinner fa-spin text-4xl text-red-600 mb-4"></i>
+          <p class="text-gray-500">Loading blood requests...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-12">
+          <div
+            class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-check-circle text-4xl text-green-500"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            No requests in your area
+          </h3>
+          <p class="text-gray-500">
+            There are no active blood requests matching your profile right now.
+          </p>
+        </div>
+
+        <!-- Requests Grid -->
+        <div
+          id="requests-container"
+          class="hidden grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+        >
+          <!-- Requests will be loaded here -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Response Modal -->
+    <div
+      id="response-modal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">Respond to Request</h3>
+            <button
+              onclick="closeResponseModal()"
+              class="text-gray-400 hover:text-gray-600"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <div id="modal-request-info" class="mb-6 p-4 bg-gray-50 rounded-xl">
+            <!-- Request info will be loaded here -->
+          </div>
+
+          <form id="response-form" class="space-y-4">
+            <input type="hidden" id="modal-request-id" />
+
+            <!-- Willingness -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-3">
+                Can you donate blood for this request?
+              </label>
+              <div class="grid grid-cols-2 gap-3">
+                <label
+                  class="flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition hover:border-green-500 has-[:checked]:border-green-500 has-[:checked]:bg-green-50"
+                >
+                  <input
+                    type="radio"
+                    name="isWilling"
+                    value="true"
+                    class="sr-only"
+                    checked
+                  />
+                  <div class="text-center">
+                    <i class="fas fa-heart text-2xl text-green-500 mb-2"></i>
+                    <p class="font-medium text-gray-900">Yes, I'll help</p>
+                  </div>
+                </label>
+                <label
+                  class="flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition hover:border-red-500 has-[:checked]:border-red-500 has-[:checked]:bg-red-50"
+                >
+                  <input
+                    type="radio"
+                    name="isWilling"
+                    value="false"
+                    class="sr-only"
+                  />
+                  <div class="text-center">
+                    <i
+                      class="fas fa-times-circle text-2xl text-red-500 mb-2"
+                    ></i>
+                    <p class="font-medium text-gray-900">Can't help now</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Preferred Contact Time -->
+            <div id="willing-options">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Preferred Contact Time
+                </label>
+                <select
+                  id="preferredContactTime"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="anytime">Anytime</option>
+                  <option value="morning">Morning (8 AM - 12 PM)</option>
+                  <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                  <option value="evening">Evening (5 PM - 9 PM)</option>
+                </select>
+              </div>
+
+              <!-- Message -->
+              <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Message to Requester (Optional)
+                </label>
+                <textarea
+                  id="response-message"
+                  rows="3"
+                  placeholder="Any message for the requester..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                ></textarea>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition"
+            >
+              <i class="fas fa-paper-plane mr-2"></i>
+              Submit Response
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <p class="text-gray-400">
+          © 2024 BDMS. Made with ❤️ by CUET CSE Students
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+
+      let allRequests = [];
+      let currentFilter = "all";
+
+      // Load blood requests on page load
+      async function loadBloodRequests() {
+        try {
+          const data = await api.getBloodRequestsForDonor();
+
+          // Show eligibility alert
+          const alertEl = document.getElementById("eligibility-alert");
+          if (!data.canDonate) {
+            alertEl.className =
+              "mb-6 p-4 rounded-xl border bg-yellow-50 border-yellow-200 text-yellow-800";
+            alertEl.innerHTML = `
+              <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle mr-3 text-yellow-500"></i>
+                <div>
+                  <p class="font-medium">You're currently not eligible to donate</p>
+                  <p class="text-sm">Your last donation was less than 3 months ago. You'll be eligible in ${data.daysUntilEligible} days.</p>
+                </div>
+              </div>
+            `;
+            alertEl.classList.remove("hidden");
+          } else {
+            alertEl.classList.add("hidden");
+          }
+
+          allRequests = data.requests || [];
+          renderRequests(allRequests);
+
+          document.getElementById("loading").classList.add("hidden");
+
+          if (allRequests.length === 0) {
+            document.getElementById("empty-state").classList.remove("hidden");
+          } else {
+            document
+              .getElementById("requests-container")
+              .classList.remove("hidden");
+          }
+        } catch (error) {
+          console.error("Error loading requests:", error);
+          document.getElementById("loading").innerHTML = `
+            <div class="text-center py-12">
+              <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
+              <p class="text-gray-700 font-medium">Please login to view blood requests</p>
+              <a href="/login" class="inline-block mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Login</a>
+            </div>
+          `;
+        }
+      }
+
+      function renderRequests(requests) {
+        const container = document.getElementById("requests-container");
+
+        if (requests.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full text-center py-8 text-gray-500">
+              No requests match this filter.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = requests
+          .map((request) => createRequestCard(request))
+          .join("");
+      }
+
+      function createRequestCard(request) {
+        const urgencyClasses = {
+          critical: "urgency-critical",
+          high: "urgency-high",
+          normal: "urgency-normal",
+          low: "urgency-low",
+        };
+
+        const urgencyLabels = {
+          critical: "🔴 Critical",
+          high: "🟠 High",
+          normal: "🟡 Normal",
+          low: "🟢 Low",
+        };
+
+        const timeAgo = getTimeAgo(new Date(request.createdAt));
+        const expiresIn = getTimeUntil(new Date(request.expiresAt));
+        const hasResponded = request.userResponseStatus !== null;
+
+        return `
+          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden ${
+            urgencyClasses[request.urgency]
+          } request-card" data-urgency="${
+          request.urgency
+        }" data-responded="${hasResponded}">
+            <div class="p-5">
+              <!-- Header -->
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center">
+                    <span class="text-2xl font-bold text-red-600">${
+                      request.bloodType
+                    }</span>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-gray-900">${
+                      request.patientName
+                    }</h3>
+                    <p class="text-sm text-gray-500">${
+                      request.hospital || request.district
+                    }</p>
+                  </div>
+                </div>
+                <span class="text-xs font-medium px-2 py-1 rounded-full ${
+                  request.urgency === "critical"
+                    ? "bg-red-100 text-red-700"
+                    : request.urgency === "high"
+                    ? "bg-orange-100 text-orange-700"
+                    : request.urgency === "normal"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-green-100 text-green-700"
+                }">
+                  ${urgencyLabels[request.urgency]}
+                </span>
+              </div>
+
+              <!-- Details -->
+              <div class="space-y-2 mb-4 text-sm">
+                <div class="flex items-center text-gray-600">
+                  <i class="fas fa-map-marker-alt w-5 text-gray-400"></i>
+                  <span>${request.upazila || request.district}, ${
+          request.division
+        }</span>
+                </div>
+                <div class="flex items-center text-gray-600">
+                  <i class="fas fa-stethoscope w-5 text-gray-400"></i>
+                  <span>${request.medicalPurpose}</span>
+                </div>
+                <div class="flex items-center text-gray-600">
+                  <i class="fas fa-clock w-5 text-gray-400"></i>
+                  <span>${timeAgo} • Expires ${expiresIn}</span>
+                </div>
+              </div>
+
+              ${
+                request.additionalNotes
+                  ? `
+                <div class="mb-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+                  <i class="fas fa-info-circle mr-2 text-gray-400"></i>
+                  ${request.additionalNotes.substring(0, 100)}${
+                      request.additionalNotes.length > 100 ? "..." : ""
+                    }
+                </div>
+              `
+                  : ""
+              }
+
+              <!-- Action Button -->
+              ${
+                hasResponded
+                  ? `
+                <div class="flex items-center justify-center py-3 bg-green-50 text-green-700 rounded-xl">
+                  <i class="fas fa-check-circle mr-2"></i>
+                  You've responded
+                </div>
+              `
+                  : `
+                <button
+                  onclick='openResponseModal(${JSON.stringify(request).replace(
+                    /'/g,
+                    "\\'"
+                  )})'
+                  class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center"
+                >
+                  <i class="fas fa-hand-holding-heart mr-2"></i>
+                  I Can Help
+                </button>
+              `
+              }
+            </div>
+          </div>
+        `;
+      }
+
+      function filterRequests(filter) {
+        currentFilter = filter;
+
+        // Update button styles
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          if (btn.dataset.filter === filter) {
+            btn.className =
+              "filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white";
+          } else {
+            btn.className =
+              "filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200";
+          }
+        });
+
+        // Filter requests
+        let filtered = allRequests;
+        if (filter === "responded") {
+          filtered = allRequests.filter((r) => r.userResponseStatus !== null);
+        } else if (filter !== "all") {
+          filtered = allRequests.filter((r) => r.urgency === filter);
+        }
+
+        renderRequests(filtered);
+      }
+
+      function openResponseModal(request) {
+        document.getElementById("modal-request-id").value = request._id;
+
+        document.getElementById("modal-request-info").innerHTML = `
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+              <span class="text-xl font-bold text-red-600">${
+                request.bloodType
+              }</span>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">${
+                request.patientName
+              }</h4>
+              <p class="text-sm text-gray-500">${
+                request.hospital || request.district
+              }</p>
+            </div>
+          </div>
+          <div class="text-sm text-gray-600 space-y-1">
+            <p><i class="fas fa-map-marker-alt w-5 text-gray-400"></i> ${
+              request.upazila || request.district
+            }, ${request.division}</p>
+            <p><i class="fas fa-stethoscope w-5 text-gray-400"></i> ${
+              request.medicalPurpose
+            }</p>
+          </div>
+        `;
+
+        document.getElementById("response-modal").classList.remove("hidden");
+      }
+
+      function closeResponseModal() {
+        document.getElementById("response-modal").classList.add("hidden");
+        document.getElementById("response-form").reset();
+      }
+
+      // Toggle willing options based on selection
+      document.querySelectorAll('input[name="isWilling"]').forEach((radio) => {
+        radio.addEventListener("change", function () {
+          const willingOptions = document.getElementById("willing-options");
+          if (this.value === "true") {
+            willingOptions.classList.remove("hidden");
+          } else {
+            willingOptions.classList.add("hidden");
+          }
+        });
+      });
+
+      // Handle response form submission
+      document
+        .getElementById("response-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const requestId = document.getElementById("modal-request-id").value;
+          const isWilling =
+            document.querySelector('input[name="isWilling"]:checked').value ===
+            "true";
+          const message = document.getElementById("response-message").value;
+          const preferredContactTime = document.getElementById(
+            "preferredContactTime"
+          ).value;
+
+          const submitBtn = this.querySelector('button[type="submit"]');
+          const originalText = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
+
+          try {
+            const result = await api.respondToBloodRequest(requestId, {
+              isWilling,
+              message,
+              preferredContactTime,
+            });
+
+            closeResponseModal();
+
+            // Show success message
+            alert(result.message);
+
+            // Reload requests
+            loadBloodRequests();
+          } catch (error) {
+            alert(error.message || "Failed to submit response");
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+          }
+        });
+
+      // Helper functions
+      function getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        const intervals = [
+          { label: "year", seconds: 31536000 },
+          { label: "month", seconds: 2592000 },
+          { label: "day", seconds: 86400 },
+          { label: "hour", seconds: 3600 },
+          { label: "minute", seconds: 60 },
+        ];
+
+        for (const interval of intervals) {
+          const count = Math.floor(seconds / interval.seconds);
+          if (count >= 1) {
+            return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
+          }
+        }
+        return "Just now";
+      }
+
+      function getTimeUntil(date) {
+        const seconds = Math.floor((date - new Date()) / 1000);
+        if (seconds < 0) return "Expired";
+
+        const days = Math.floor(seconds / 86400);
+        const hours = Math.floor((seconds % 86400) / 3600);
+
+        if (days > 0) return `in ${days} day${days > 1 ? "s" : ""}`;
+        if (hours > 0) return `in ${hours} hour${hours > 1 ? "s" : ""}`;
+        return "Soon";
+      }
+
+      // Close modal on outside click
+      document
+        .getElementById("response-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeResponseModal();
+          }
+        });
+
+      // Initialize
+      loadBloodRequests();
+    </script>
+  </body>
+</html>

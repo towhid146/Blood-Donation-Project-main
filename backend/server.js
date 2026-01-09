@@ -17,6 +17,8 @@ const donationRoutes = require("./routes/donationRoutes");
 const recipientRoutes = require("./routes/recipientRoutes");
 const hbcRoutes = require("./routes/hbcRoutes");
 const reportRoutes = require("./routes/reportRoutes");
+const bloodRequestRoutes = require("./routes/bloodRequestRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 
 // Import passport config
 require("./config/passport");
@@ -145,6 +147,18 @@ app.get("/formPage", (req, res) => {
   res.sendFile(path.join(templatesDir, "formPage.html"));
 });
 
+app.get("/bloodRequests", (req, res) => {
+  res.sendFile(path.join(templatesDir, "bloodRequests.html"));
+});
+
+app.get("/myRequests", (req, res) => {
+  res.sendFile(path.join(templatesDir, "myRequests.html"));
+});
+
+app.get("/requestDetails/:id", (req, res) => {
+  res.sendFile(path.join(templatesDir, "requestDetails.html"));
+});
+
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -153,6 +167,8 @@ app.use("/api/donations", donationRoutes);
 app.use("/api/recipients", recipientRoutes);
 app.use("/api/hbc", hbcRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/blood-requests", bloodRequestRoutes);
+app.use("/api/messages", messageRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

@@ -112,17 +112,32 @@ function renderNavbar(navbar, data) {
   // Common links for all users
   navbarHtml += `<a href="/donorListPage" class="${linkClass}">Find Donors</a>`;
   navbarHtml += `<a href="/formPage" class="${linkClass}">Request Blood</a>`;
-  navbarHtml += `<a href="/aboutUsPage" class="${linkClass}">About</a>`;
 
   // Dynamic links based on login status
   if (data.loggedIn) {
+    // Blood Requests (for donors) with notification badge
+    navbarHtml += `<a href="/bloodRequests" class="${linkClass} relative" id="blood-requests-link">
+      <i class="fas fa-bell mr-1"></i>Blood Requests
+      <span id="request-badge" class="hidden absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"></span>
+    </a>`;
+
+    // My Requests (for requesters)
+    navbarHtml += `<a href="/myRequests" class="${linkClass} relative" id="my-requests-link">
+      <i class="fas fa-list-alt mr-1"></i>My Requests
+      <span id="response-badge" class="hidden absolute -top-2 -right-2 w-5 h-5 bg-green-500 text-white text-xs rounded-full flex items-center justify-center"></span>
+    </a>`;
+
     navbarHtml += `<a href="/profile" class="${linkClass}">
       <i class="fas fa-user-circle mr-1"></i>${data.username}
     </a>`;
     navbarHtml += `<a href="#" id="logout-btn" class="${btnClass}">
       <i class="fas fa-sign-out-alt mr-1"></i>Logout
     </a>`;
+
+    // Load notification counts after render
+    setTimeout(() => loadNotificationCounts(), 100);
   } else {
+    navbarHtml += `<a href="/aboutUsPage" class="${linkClass}">About</a>`;
     navbarHtml += `<a href="/login" class="${linkClass}">Login</a>`;
     navbarHtml += `<a href="/signUp" class="${btnClass}">Sign Up</a>`;
   }
@@ -149,11 +164,19 @@ function renderMobileMenu(data) {
   // Common links
   menuHtml += `<a href="/donorListPage" class="${linkClass}">Find Donors</a>`;
   menuHtml += `<a href="/formPage" class="${linkClass}">Request Blood</a>`;
-  menuHtml += `<a href="/donorTablePage" class="${linkClass}">Donor Table</a>`;
-  menuHtml += `<a href="/aboutUsPage" class="${linkClass}">About Us</a>`;
 
   // Dynamic links based on login status
   if (data.loggedIn) {
+    menuHtml += `<a href="/bloodRequests" class="${linkClass}">
+      <i class="fas fa-bell mr-2"></i>Blood Requests
+      <span id="mobile-request-badge" class="hidden ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full"></span>
+    </a>`;
+    menuHtml += `<a href="/myRequests" class="${linkClass}">
+      <i class="fas fa-list-alt mr-2"></i>My Requests
+      <span id="mobile-response-badge" class="hidden ml-2 px-2 py-0.5 bg-green-500 text-white text-xs rounded-full"></span>
+    </a>`;
+    menuHtml += `<a href="/donorTablePage" class="${linkClass}">Donor Table</a>`;
+    menuHtml += `<a href="/aboutUsPage" class="${linkClass}">About Us</a>`;
     menuHtml += `<a href="/profile" class="${linkClass}">
       <i class="fas fa-user-circle mr-2"></i>Profile (${data.username})
     </a>`;
@@ -161,6 +184,8 @@ function renderMobileMenu(data) {
       <i class="fas fa-sign-out-alt mr-2"></i>Logout
     </a>`;
   } else {
+    menuHtml += `<a href="/donorTablePage" class="${linkClass}">Donor Table</a>`;
+    menuHtml += `<a href="/aboutUsPage" class="${linkClass}">About Us</a>`;
     menuHtml += `<a href="/login" class="${linkClass}">Login</a>`;
     menuHtml += `<a href="/signUp" class="${btnClass}">Sign Up</a>`;
   }
@@ -218,3 +243,52 @@ function initMobileMenu() {
 
 // Initialize mobile menu on load
 document.addEventListener("DOMContentLoaded", initMobileMenu);
+
+/**
+ * Load notification counts for logged-in users
+ */
+async function loadNotificationCounts() {
+  try {
+    if (typeof api !== "undefined" && api.getNotificationCount) {
+      const data = await api.getNotificationCount();
+      
+      // Update desktop badges
+      const requestBadge = document.getElementById("request-badge");
+      const responseBadge = document.getElementById("response-badge");
+      
+      if (requestBadge && data.newRequestsCount > 0) {
+        requestBadge.textContent = data.newRequestsCount > 9 ? "9+" : data.newRequestsCount;
+        requestBadge.classList.remove("hidden");
+      }
+      
+      if (responseBadge && data.unseenResponsesCount > 0) {
+        responseBadge.textContent = data.unseenResponsesCount > 9 ? "9+" : data.unseenResponsesCount;
+        responseBadge.classList.remove("hidden");
+      }
+      
+      // Update mobile badges
+      const mobileRequestBadge = document.getElementById("mobile-request-badge");
+      const mobileResponseBadge = document.getElementById("mobile-response-badge");
+      
+      if (mobileRequestBadge && data.newRequestsCount > 0) {
+        mobileRequestBadge.textContent = data.newRequestsCount;
+        mobileRequestBadge.classList.remove("hidden");
+      }
+      
+      if (mobileResponseBadge && data.unseenResponsesCount > 0) {
+        mobileResponseBadge.textContent = data.unseenResponsesCount;
+        mobileResponseBadge.classList.remove("hidden");
+      }
+    }
+  } catch (error) {
+    console.error("Error loading notification counts:", error);
+  }
+}
+
+// Refresh notifications periodically (every 60 seconds)
+setInterval(() => {
+  const navbar = document.getElementById("navbar");
+  if (navbar && navbar.querySelector("#request-badge")) {
+    loadNotificationCounts();
+  }
+}, 60000);

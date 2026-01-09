@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Blood Requests - BDMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="/js/api.js"></script>
+    <script src="/js/navbar.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .hero-pattern {
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .blood-drop {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Navbar -->
+    <nav
+      class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between items-center h-16">
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >BD<span class="text-red-600">MS</span></span
+            >
+          </a>
+
+          <div id="navbar" class="hidden md:flex items-center space-x-6"></div>
+
+          <button id="menu-btn" class="md:hidden p-2 text-gray-600">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t px-4 py-4 space-y-3"
+      ></div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="hero-pattern min-h-screen pt-20 pb-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <!-- Header -->
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between mb-8"
+        >
+          <div>
+            <div
+              class="inline-flex items-center px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full mb-4"
+            >
+              <i class="fas fa-list-alt mr-2"></i>
+              My Blood Requests
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+              Track Your Requests
+            </h1>
+            <p class="text-gray-600">
+              View responses from willing donors for your blood requests.
+            </p>
+          </div>
+          <a
+            href="/formPage"
+            class="mt-4 md:mt-0 inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition"
+          >
+            <i class="fas fa-plus mr-2"></i>
+            New Request
+          </a>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-12">
+          <i class="fas fa-spinner fa-spin text-4xl text-red-600 mb-4"></i>
+          <p class="text-gray-500">Loading your requests...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-12">
+          <div
+            class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-inbox text-4xl text-gray-400"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            No requests yet
+          </h3>
+          <p class="text-gray-500 mb-6">
+            You haven't submitted any blood requests.
+          </p>
+          <a
+            href="/formPage"
+            class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition"
+          >
+            <i class="fas fa-plus mr-2"></i>
+            Submit a Request
+          </a>
+        </div>
+
+        <!-- Requests List -->
+        <div id="requests-container" class="hidden space-y-6">
+          <!-- Requests will be loaded here -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Donors Modal -->
+    <div
+      id="donors-modal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+      >
+        <div class="p-6 border-b">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-900">Willing Donors</h3>
+            <button
+              onclick="closeDonorsModal()"
+              class="text-gray-400 hover:text-gray-600"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <p class="text-gray-500 text-sm mt-1" id="modal-request-summary"></p>
+        </div>
+
+        <div id="donors-list" class="flex-1 overflow-y-auto p-6">
+          <!-- Donors will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div
+      id="message-modal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col"
+      >
+        <div class="p-4 border-b flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              id="chat-avatar"
+              class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-user text-red-600"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900" id="chat-name">
+                Donor Name
+              </h4>
+              <p class="text-xs text-gray-500" id="chat-status">Online</p>
+            </div>
+          </div>
+          <button
+            onclick="closeMessageModal()"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <div
+          id="messages-container"
+          class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 min-h-[300px]"
+        >
+          <!-- Messages will be loaded here -->
+        </div>
+
+        <div class="p-4 border-t">
+          <form id="message-form" class="flex space-x-3">
+            <input type="hidden" id="chat-request-id" />
+            <input type="hidden" id="chat-donor-id" />
+            <input
+              type="text"
+              id="message-input"
+              placeholder="Type your message..."
+              class="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+              autocomplete="off"
+            />
+            <button
+              type="submit"
+              class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition"
+            >
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <p class="text-gray-400">
+          © 2024 BDMS. Made with ❤️ by CUET CSE Students
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+
+      let allRequests = [];
+      let currentRequestId = null;
+      let currentDonorId = null;
+
+      // Load my requests
+      async function loadMyRequests() {
+        try {
+          const data = await api.getMyBloodRequests();
+          allRequests = data.requests || [];
+
+          document.getElementById("loading").classList.add("hidden");
+
+          if (allRequests.length === 0) {
+            document.getElementById("empty-state").classList.remove("hidden");
+          } else {
+            document
+              .getElementById("requests-container")
+              .classList.remove("hidden");
+            renderRequests(allRequests);
+          }
+        } catch (error) {
+          console.error("Error loading requests:", error);
+          document.getElementById("loading").innerHTML = `
+            <div class="text-center py-12">
+              <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
+              <p class="text-gray-700 font-medium">Please login to view your requests</p>
+              <a href="/login" class="inline-block mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Login</a>
+            </div>
+          `;
+        }
+      }
+
+      function renderRequests(requests) {
+        const container = document.getElementById("requests-container");
+
+        container.innerHTML = requests
+          .map((request) => createRequestCard(request))
+          .join("");
+      }
+
+      function createRequestCard(request) {
+        const statusClasses = {
+          active: "bg-green-100 text-green-700",
+          fulfilled: "bg-blue-100 text-blue-700",
+          cancelled: "bg-gray-100 text-gray-700",
+          expired: "bg-red-100 text-red-700",
+        };
+
+        const urgencyLabels = {
+          critical: "🔴 Critical",
+          high: "🟠 High",
+          normal: "🟡 Normal",
+          low: "🟢 Low",
+        };
+
+        const timeAgo = getTimeAgo(new Date(request.createdAt));
+
+        return `
+          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="p-6">
+              <!-- Header -->
+              <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
+                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                  <div class="w-16 h-16 bg-red-100 rounded-xl flex items-center justify-center">
+                    <span class="text-2xl font-bold text-red-600">${
+                      request.bloodType
+                    }</span>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">${
+                      request.patientName
+                    }</h3>
+                    <p class="text-sm text-gray-500">${
+                      request.hospital || request.district
+                    }, ${request.division}</p>
+                    <p class="text-xs text-gray-400 mt-1">${timeAgo} • ${
+          urgencyLabels[request.urgency]
+        }</p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <span class="px-3 py-1 text-xs font-medium rounded-full ${
+                    statusClasses[request.status]
+                  }">
+                    ${
+                      request.status.charAt(0).toUpperCase() +
+                      request.status.slice(1)
+                    }
+                  </span>
+                  ${
+                    request.status === "active"
+                      ? `
+                    <button
+                      onclick="updateRequestStatus('${request._id}', 'cancelled')"
+                      class="text-gray-400 hover:text-red-600 transition"
+                      title="Cancel Request"
+                    >
+                      <i class="fas fa-times-circle"></i>
+                    </button>
+                  `
+                      : ""
+                  }
+                </div>
+              </div>
+
+              <!-- Stats -->
+              <div class="grid grid-cols-3 gap-4 mb-4">
+                <div class="text-center p-3 bg-gray-50 rounded-xl">
+                  <p class="text-2xl font-bold text-gray-900">${
+                    request.notifiedDonors || 0
+                  }</p>
+                  <p class="text-xs text-gray-500">Donors Notified</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-xl">
+                  <p class="text-2xl font-bold text-gray-900">${
+                    request.totalResponses || 0
+                  }</p>
+                  <p class="text-xs text-gray-500">Responses</p>
+                </div>
+                <div class="text-center p-3 bg-green-50 rounded-xl ${
+                  request.willingDonors > 0
+                    ? "cursor-pointer hover:bg-green-100 transition"
+                    : ""
+                }" ${
+          request.willingDonors > 0
+            ? `onclick="viewWillingDonors('${request._id}')"`
+            : ""
+        }>
+                  <p class="text-2xl font-bold text-green-600">
+                    ${request.willingDonors || 0}
+                    ${
+                      request.unseenResponses > 0
+                        ? `<span class="inline-flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full">${request.unseenResponses}</span>`
+                        : ""
+                    }
+                  </p>
+                  <p class="text-xs text-gray-500">Willing to Donate</p>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              ${
+                request.willingDonors > 0
+                  ? `
+                <button
+                  onclick="viewWillingDonors('${request._id}')"
+                  class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center"
+                >
+                  <i class="fas fa-users mr-2"></i>
+                  View Willing Donors (${request.willingDonors})
+                  ${
+                    request.unseenResponses > 0
+                      ? `<span class="ml-2 bg-white text-green-600 text-xs px-2 py-0.5 rounded-full">${request.unseenResponses} new</span>`
+                      : ""
+                  }
+                </button>
+              `
+                  : `
+                <div class="text-center py-3 bg-gray-50 text-gray-500 rounded-xl">
+                  <i class="fas fa-hourglass-half mr-2"></i>
+                  Waiting for donor responses...
+                </div>
+              `
+              }
+            </div>
+          </div>
+        `;
+      }
+
+      async function viewWillingDonors(requestId) {
+        currentRequestId = requestId;
+
+        try {
+          const data = await api.getBloodRequestById(requestId);
+          const request = data.request;
+          const donors = data.willingDonors || [];
+
+          document.getElementById("modal-request-summary").textContent = `${
+            request.bloodType
+          } blood for ${request.patientName} at ${
+            request.hospital || request.district
+          }`;
+
+          const donorsList = document.getElementById("donors-list");
+
+          if (donors.length === 0) {
+            donorsList.innerHTML = `
+              <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-user-slash text-4xl mb-4"></i>
+                <p>No willing donors yet</p>
+              </div>
+            `;
+          } else {
+            donorsList.innerHTML = donors
+              .map((response) => createDonorCard(response, requestId))
+              .join("");
+          }
+
+          document.getElementById("donors-modal").classList.remove("hidden");
+
+          // Reload requests to update seen status
+          loadMyRequests();
+        } catch (error) {
+          console.error("Error loading donors:", error);
+          alert("Failed to load donors. Please try again.");
+        }
+      }
+
+      function createDonorCard(response, requestId) {
+        const donor = response.donor;
+        const timeAgo = getTimeAgo(new Date(response.createdAt));
+        const lastDonation = donor.lastDonationDate
+          ? getTimeAgo(new Date(donor.lastDonationDate))
+          : "Never";
+
+        const contactTimeLabels = {
+          anytime: "Anytime",
+          morning: "Morning (8 AM - 12 PM)",
+          afternoon: "Afternoon (12 PM - 5 PM)",
+          evening: "Evening (5 PM - 9 PM)",
+        };
+
+        return `
+          <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center overflow-hidden">
+                  ${
+                    donor.profilePicture
+                      ? `<img src="${donor.profilePicture}" alt="${donor.firstName}" class="w-full h-full object-cover" />`
+                      : `<span class="text-lg font-bold text-red-600">${
+                          donor.firstName?.charAt(0) || "D"
+                        }</span>`
+                  }
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">${donor.firstName} ${
+          donor.lastName
+        }</h4>
+                  <p class="text-sm text-gray-500">${
+                    donor.district || "Unknown location"
+                  }</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="inline-flex items-center px-2 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
+                  ${donor.bloodType}
+                </span>
+                <p class="text-xs text-gray-400 mt-1">${timeAgo}</p>
+              </div>
+            </div>
+
+            <!-- Donor Stats -->
+            <div class="grid grid-cols-3 gap-2 mb-4 text-center text-sm">
+              <div class="p-2 bg-gray-50 rounded-lg">
+                <p class="font-semibold text-gray-900">${
+                  donor.donationsCount || 0
+                }</p>
+                <p class="text-xs text-gray-500">Donations</p>
+              </div>
+              <div class="p-2 bg-gray-50 rounded-lg">
+                <p class="font-semibold text-gray-900">${Math.round(
+                  donor.responseRatio || 0
+                )}%</p>
+                <p class="text-xs text-gray-500">Response</p>
+              </div>
+              <div class="p-2 bg-gray-50 rounded-lg">
+                <p class="font-semibold text-gray-900">${lastDonation}</p>
+                <p class="text-xs text-gray-500">Last Donated</p>
+              </div>
+            </div>
+
+            ${
+              response.message
+                ? `
+              <div class="mb-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
+                <i class="fas fa-comment-alt mr-2"></i>
+                "${response.message}"
+              </div>
+            `
+                : ""
+            }
+
+            <div class="text-sm text-gray-600 mb-4">
+              <i class="fas fa-clock mr-2 text-gray-400"></i>
+              Preferred contact time: <span class="font-medium">${
+                contactTimeLabels[response.preferredContactTime]
+              }</span>
+            </div>
+
+            <!-- Contact Info & Actions -->
+            <div class="flex flex-col sm:flex-row gap-3">
+              <a
+                href="tel:${donor.number}"
+                class="flex-1 flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition"
+              >
+                <i class="fas fa-phone mr-2"></i>
+                ${donor.number}
+              </a>
+              <button
+                onclick='openMessageModal(${JSON.stringify({
+                  requestId,
+                  donorId: donor._id,
+                  donorName: `${donor.firstName} ${donor.lastName}`,
+                  donorPicture: donor.profilePicture,
+                }).replace(/'/g, "\\'")})'
+                class="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+              >
+                <i class="fas fa-comment mr-2"></i>
+                Message
+              </button>
+              ${
+                !response.donationCompleted
+                  ? `
+                <button
+                  onclick="markAsCompleted('${response._id}')"
+                  class="flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition"
+                  title="Mark donation as completed"
+                >
+                  <i class="fas fa-check"></i>
+                </button>
+              `
+                  : `
+                <span class="flex items-center justify-center px-4 py-2 bg-green-100 text-green-700 font-medium rounded-lg">
+                  <i class="fas fa-check-circle mr-1"></i>
+                  Completed
+                </span>
+              `
+              }
+            </div>
+          </div>
+        `;
+      }
+
+      function closeDonorsModal() {
+        document.getElementById("donors-modal").classList.add("hidden");
+        currentRequestId = null;
+      }
+
+      async function openMessageModal(data) {
+        currentRequestId = data.requestId;
+        currentDonorId = data.donorId;
+
+        document.getElementById("chat-request-id").value = data.requestId;
+        document.getElementById("chat-donor-id").value = data.donorId;
+        document.getElementById("chat-name").textContent = data.donorName;
+
+        const avatar = document.getElementById("chat-avatar");
+        if (data.donorPicture) {
+          avatar.innerHTML = `<img src="${data.donorPicture}" alt="${data.donorName}" class="w-full h-full object-cover rounded-full" />`;
+        } else {
+          avatar.innerHTML = `<i class="fas fa-user text-red-600"></i>`;
+        }
+
+        // Load conversation
+        await loadConversation(data.requestId, data.donorId);
+
+        document.getElementById("message-modal").classList.remove("hidden");
+        document.getElementById("message-input").focus();
+      }
+
+      async function loadConversation(requestId, donorId) {
+        try {
+          const data = await api.getConversation(requestId, donorId);
+          const messages = data.messages || [];
+
+          const container = document.getElementById("messages-container");
+
+          if (messages.length === 0) {
+            container.innerHTML = `
+              <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-comments text-3xl mb-2"></i>
+                <p>No messages yet. Start the conversation!</p>
+              </div>
+            `;
+          } else {
+            container.innerHTML = messages
+              .map((msg) => createMessageBubble(msg))
+              .join("");
+            container.scrollTop = container.scrollHeight;
+          }
+        } catch (error) {
+          console.error("Error loading conversation:", error);
+        }
+      }
+
+      function createMessageBubble(msg) {
+        const isMe = msg.sender._id !== currentDonorId;
+        const time = new Date(msg.createdAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return `
+          <div class="flex ${isMe ? "justify-end" : "justify-start"}">
+            <div class="${
+              isMe ? "bg-red-600 text-white" : "bg-white text-gray-900"
+            } rounded-2xl px-4 py-2 max-w-[80%] shadow-sm">
+              <p>${msg.content}</p>
+              <p class="text-xs ${
+                isMe ? "text-red-200" : "text-gray-400"
+              } mt-1">${time}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      function closeMessageModal() {
+        document.getElementById("message-modal").classList.add("hidden");
+        currentDonorId = null;
+      }
+
+      // Send message
+      document
+        .getElementById("message-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const requestId = document.getElementById("chat-request-id").value;
+          const donorId = document.getElementById("chat-donor-id").value;
+          const content = document.getElementById("message-input").value.trim();
+
+          if (!content) return;
+
+          try {
+            await api.sendMessage(requestId, donorId, content);
+            document.getElementById("message-input").value = "";
+            await loadConversation(requestId, donorId);
+          } catch (error) {
+            console.error("Error sending message:", error);
+            alert("Failed to send message. Please try again.");
+          }
+        });
+
+      async function markAsCompleted(responseId) {
+        if (
+          !confirm(
+            "Mark this donation as completed? This will update the donor's stats."
+          )
+        ) {
+          return;
+        }
+
+        try {
+          await api.markDonationComplete(responseId);
+          alert("Donation marked as completed. Thank you!");
+
+          // Reload donors
+          if (currentRequestId) {
+            viewWillingDonors(currentRequestId);
+          }
+          loadMyRequests();
+        } catch (error) {
+          console.error("Error marking complete:", error);
+          alert(error.message || "Failed to update. Please try again.");
+        }
+      }
+
+      async function updateRequestStatus(requestId, status) {
+        if (
+          !confirm(
+            `Are you sure you want to ${
+              status === "cancelled" ? "cancel" : "update"
+            } this request?`
+          )
+        ) {
+          return;
+        }
+
+        try {
+          await api.updateBloodRequestStatus(requestId, status);
+          loadMyRequests();
+        } catch (error) {
+          console.error("Error updating status:", error);
+          alert(error.message || "Failed to update. Please try again.");
+        }
+      }
+
+      // Helper function
+      function getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        const intervals = [
+          { label: "year", seconds: 31536000 },
+          { label: "month", seconds: 2592000 },
+          { label: "day", seconds: 86400 },
+          { label: "hour", seconds: 3600 },
+          { label: "minute", seconds: 60 },
+        ];
+
+        for (const interval of intervals) {
+          const count = Math.floor(seconds / interval.seconds);
+          if (count >= 1) {
+            return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
+          }
+        }
+        return "Just now";
+      }
+
+      // Close modals on outside click
+      document
+        .getElementById("donors-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeDonorsModal();
+        });
+      document
+        .getElementById("message-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeMessageModal();
+        });
+
+      // Initialize
+      loadMyRequests();
+    </script>
+  </body>
+</html>

@@ -227,28 +227,92 @@ class ApiService {
    * Create blood request
    */
   async createBloodRequest(requestData) {
-    return this.request("/recipients", {
+    return this.request("/blood-requests", {
       method: "POST",
       body: JSON.stringify(requestData),
     });
   }
 
   /**
-   * Get all pending requests
+   * Get blood requests for donor (in their area)
+   */
+  async getBloodRequestsForDonor() {
+    return this.request("/blood-requests/for-donor");
+  }
+
+  /**
+   * Get my blood requests (as requester)
+   */
+  async getMyBloodRequests() {
+    return this.request("/blood-requests/my-requests");
+  }
+
+  /**
+   * Get single blood request with responses
+   */
+  async getBloodRequestById(id) {
+    return this.request(`/blood-requests/${id}`);
+  }
+
+  /**
+   * Update blood request status
+   */
+  async updateBloodRequestStatus(id, status) {
+    return this.request(`/blood-requests/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  /**
+   * Respond to a blood request (as donor)
+   */
+  async respondToBloodRequest(requestId, responseData) {
+    return this.request(`/blood-requests/${requestId}/respond`, {
+      method: "POST",
+      body: JSON.stringify(responseData),
+    });
+  }
+
+  /**
+   * Get my responses (as donor)
+   */
+  async getMyDonorResponses() {
+    return this.request("/blood-requests/donor/my-responses");
+  }
+
+  /**
+   * Mark donation as completed
+   */
+  async markDonationComplete(responseId) {
+    return this.request(`/blood-requests/response/${responseId}/complete`, {
+      method: "PATCH",
+    });
+  }
+
+  /**
+   * Get notification count
+   */
+  async getNotificationCount() {
+    return this.request("/blood-requests/notifications/count");
+  }
+
+  /**
+   * Get all pending requests (legacy)
    */
   async getPendingRequests() {
     return this.request("/recipients");
   }
 
   /**
-   * Get urgent blood requests
+   * Get urgent blood requests (legacy)
    */
   async getUrgentRequests() {
     return this.request("/recipients/urgent");
   }
 
   /**
-   * Get requests by blood group
+   * Get requests by blood group (legacy)
    */
   async getRequestsByBloodGroup(bloodGroup) {
     return this.request(
@@ -257,12 +321,54 @@ class ApiService {
   }
 
   /**
-   * Update request status
+   * Update request status (legacy)
    */
   async updateRequestStatus(id, status) {
     return this.request(`/recipients/${id}/status`, {
       method: "PUT",
       body: JSON.stringify({ status }),
+    });
+  }
+
+  // ==================== MESSAGES ====================
+
+  /**
+   * Send a message
+   */
+  async sendMessage(bloodRequestId, receiverId, content) {
+    return this.request("/messages/send", {
+      method: "POST",
+      body: JSON.stringify({ bloodRequestId, receiverId, content }),
+    });
+  }
+
+  /**
+   * Get conversation between two users
+   */
+  async getConversation(bloodRequestId, userId) {
+    return this.request(`/messages/conversation/${bloodRequestId}/${userId}`);
+  }
+
+  /**
+   * Get all conversations
+   */
+  async getConversations() {
+    return this.request("/messages/conversations");
+  }
+
+  /**
+   * Get unread message count
+   */
+  async getUnreadMessageCount() {
+    return this.request("/messages/unread-count");
+  }
+
+  /**
+   * Mark messages as read
+   */
+  async markMessagesRead(bloodRequestId, userId) {
+    return this.request(`/messages/mark-read/${bloodRequestId}/${userId}`, {
+      method: "PATCH",
     });
   }
 
