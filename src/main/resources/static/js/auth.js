@@ -65,6 +65,27 @@ function initSignupForm(form) {
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    // Get location fields (new structure)
+    const divisionEl = document.getElementById("division");
+    const districtEl = document.getElementById("district");
+    const upazilaEl = document.getElementById("upazila");
+    const cityEl = document.getElementById("city");
+
+    // Support both old city field and new location dropdowns
+    let location = "";
+    let division = "";
+    let district = "";
+    let upazila = "";
+
+    if (divisionEl && districtEl && upazilaEl) {
+      division = divisionEl.value || "";
+      district = districtEl.value || "";
+      upazila = upazilaEl.value || "";
+      location = [upazila, district, division].filter(Boolean).join(", ");
+    } else if (cityEl) {
+      location = cityEl.value.trim();
+    }
+
     const formData = {
       username: document.getElementById("username").value.trim(),
       firstName: document.getElementById("firstName").value.trim(),
@@ -72,7 +93,10 @@ function initSignupForm(form) {
       email: document.getElementById("email").value.trim(),
       number: document.getElementById("number").value.trim(),
       bloodType: document.getElementById("bloodType").value,
-      location: document.getElementById("location").value.trim(),
+      division: division,
+      district: district,
+      upazila: upazila,
+      location: location,
       age: parseInt(document.getElementById("age").value),
       gender: document.getElementById("gender").value,
       password: document.getElementById("password").value,

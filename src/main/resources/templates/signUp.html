@@ -12,6 +12,7 @@
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/navbar.js"></script>
+    <script src="/js/bdLocations.js"></script>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
       * {
@@ -371,27 +372,86 @@
                   </div>
                 </div>
 
-                <!-- City -->
-                <div>
-                  <label
-                    for="city"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                    >City *</label
-                  >
-                  <div class="relative">
-                    <span
-                      class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                <!-- Location Section -->
+                <div class="grid md:grid-cols-3 gap-5">
+                  <!-- Division -->
+                  <div>
+                    <label
+                      for="division"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Division *</label
                     >
-                      <i class="fas fa-map-marker-alt"></i>
-                    </span>
-                    <input
-                      id="city"
-                      name="city"
-                      type="text"
-                      required
-                      class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
-                      placeholder="Your city"
-                    />
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-map"></i>
+                      </span>
+                      <select
+                        id="division"
+                        name="division"
+                        required
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white"
+                      >
+                        <option value="" disabled selected>
+                          Select Division
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- District -->
+                  <div>
+                    <label
+                      for="district"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >District *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-city"></i>
+                      </span>
+                      <select
+                        id="district"
+                        name="district"
+                        required
+                        disabled
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white disabled:bg-gray-100"
+                      >
+                        <option value="" disabled selected>
+                          Select District
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Upazila/Thana -->
+                  <div>
+                    <label
+                      for="upazila"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                      >Upazila/Thana *</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-map-marker-alt"></i>
+                      </span>
+                      <select
+                        id="upazila"
+                        name="upazila"
+                        required
+                        disabled
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white disabled:bg-gray-100"
+                      >
+                        <option value="" disabled selected>
+                          Select Upazila
+                        </option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -502,6 +562,73 @@
     <script>
       document.getElementById("menu-btn").addEventListener("click", () => {
         document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+
+      // Initialize Bangladesh Location Dropdowns
+      document.addEventListener("DOMContentLoaded", function () {
+        const divisionSelect = document.getElementById("division");
+        const districtSelect = document.getElementById("district");
+        const upazilaSelect = document.getElementById("upazila");
+
+        // Populate divisions
+        if (window.BD_LOCATIONS && BD_LOCATIONS.divisions) {
+          BD_LOCATIONS.divisions.forEach((division) => {
+            const option = document.createElement("option");
+            option.value = division.name;
+            option.textContent = division.name;
+            divisionSelect.appendChild(option);
+          });
+        }
+
+        // Handle division change
+        divisionSelect.addEventListener("change", function () {
+          const selectedDivision = BD_LOCATIONS.divisions.find(
+            (d) => d.name === this.value
+          );
+
+          // Reset district and upazila
+          districtSelect.innerHTML =
+            '<option value="" disabled selected>Select District</option>';
+          upazilaSelect.innerHTML =
+            '<option value="" disabled selected>Select Upazila</option>';
+          districtSelect.disabled = true;
+          upazilaSelect.disabled = true;
+
+          if (selectedDivision && selectedDivision.districts) {
+            selectedDivision.districts.forEach((district) => {
+              const option = document.createElement("option");
+              option.value = district.name;
+              option.textContent = district.name;
+              districtSelect.appendChild(option);
+            });
+            districtSelect.disabled = false;
+          }
+        });
+
+        // Handle district change
+        districtSelect.addEventListener("change", function () {
+          const selectedDivision = BD_LOCATIONS.divisions.find(
+            (d) => d.name === divisionSelect.value
+          );
+          const selectedDistrict = selectedDivision?.districts.find(
+            (d) => d.name === this.value
+          );
+
+          // Reset upazila
+          upazilaSelect.innerHTML =
+            '<option value="" disabled selected>Select Upazila</option>';
+          upazilaSelect.disabled = true;
+
+          if (selectedDistrict && selectedDistrict.upazilas) {
+            selectedDistrict.upazilas.forEach((upazila) => {
+              const option = document.createElement("option");
+              option.value = upazila;
+              option.textContent = upazila;
+              upazilaSelect.appendChild(option);
+            });
+            upazilaSelect.disabled = false;
+          }
+        });
       });
     </script>
   </body>

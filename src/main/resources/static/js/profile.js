@@ -36,15 +36,15 @@ async function loadProfile() {
  */
 function displayProfile(user) {
   // Name
-  const nameEl = document.querySelector("h2.text-2xl");
+  const nameEl = document.querySelector("h2.text-2xl") || document.querySelector('[data-field="name"]');
   if (nameEl) {
     nameEl.textContent = `${user.firstName} ${user.lastName}`;
   }
 
   // Blood type
-  const bloodTypeEl = document.querySelector("p.text-red-600");
+  const bloodTypeEl = document.querySelector('[data-field="bloodType"]');
   if (bloodTypeEl) {
-    bloodTypeEl.textContent = `${user.bloodType} Blood Group`;
+    bloodTypeEl.innerHTML = `<i class="fas fa-tint mr-2"></i>${user.bloodType} Blood Group`;
   }
 
   // Profile details
@@ -54,7 +54,18 @@ function displayProfile(user) {
     '[data-field="lastDonationDate"]',
     formatDate(user.lastDonationDate)
   );
-  setTextContent('[data-field="location"]', user.location);
+  
+  // Location - show full location if available
+  const locationText = user.fullLocation || user.location || 
+    [user.upazila, user.district, user.division].filter(Boolean).join(', ') || '--';
+  setTextContent('[data-field="location"]', locationText);
+
+  // Additional profile fields
+  setTextContent('[data-field="email"]', user.email);
+  setTextContent('[data-field="phone"]', user.number);
+  setTextContent('[data-field="fullName"]', `${user.firstName} ${user.lastName}`);
+  setTextContent('[data-field="city"]', user.district || user.location || '--');
+  setTextContent('[data-field="bloodTypeDisplay"]', user.bloodType);
 
   // Donation stats
   const donationsCount = user.donationsCount || 0;
@@ -79,6 +90,78 @@ function displayProfile(user) {
 
   // Update progress circle with animation
   updateProgressCircle(ratio);
+
+  // Profile Completion
+  displayProfileCompletion(user.profileCompletion || 0, user.missingFields || []);
+}
+
+/**
+ * Display profile completion percentage
+ */
+function displayProfileCompletion(percentage, missingFields) {
+  const percentEl = document.getElementById('profileCompletionPercent');
+  const barEl = document.getElementById('profileCompletionBar');
+  const missingSection = document.getElementById('missingFieldsSection');
+  const missingList = document.getElementById('missingFieldsList');
+  const completedMsg = document.getElementById('completedMessage');
+
+  // Animate percentage
+  if (percentEl) {
+    animateProfileCompletion(percentEl, 0, percentage, 1000);
+  }
+
+  // Animate progress bar
+  if (barEl) {
+    setTimeout(() => {
+      barEl.style.width = `${percentage}%`;
+      
+      // Change color based on completion
+      if (percentage >= 100) {
+        barEl.className = 'bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-1000';
+      } else if (percentage >= 70) {
+        barEl.className = 'bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full transition-all duration-1000';
+      }
+    }, 100);
+  }
+
+  // Show missing fields or completed message
+  if (percentage >= 100) {
+    if (completedMsg) completedMsg.classList.remove('hidden');
+    if (missingSection) missingSection.classList.add('hidden');
+  } else if (missingFields && missingFields.length > 0) {
+    if (missingSection) missingSection.classList.remove('hidden');
+    if (completedMsg) completedMsg.classList.add('hidden');
+    
+    if (missingList) {
+      missingList.innerHTML = missingFields.map(field => 
+        `<span class="px-3 py-1 bg-yellow-50 text-yellow-700 text-sm rounded-full border border-yellow-200">
+          <i class="fas fa-exclamation-circle mr-1"></i>${field}
+        </span>`
+      ).join('');
+    }
+  }
+}
+
+/**
+ * Animate profile completion counter
+ */
+function animateProfileCompletion(element, start, end, duration) {
+  const startTime = performance.now();
+  
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(start + (end - start) * easeOut);
+    
+    element.textContent = `${current}%`;
+    
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+  
+  requestAnimationFrame(update);
 }
 
 /**

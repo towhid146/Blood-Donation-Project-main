@@ -24,10 +24,6 @@ const signupValidation = [
   body("number")
     .matches(/^\+?[0-9]{10,15}$/)
     .withMessage("Mobile number must be valid"),
-  body("location")
-    .trim()
-    .isLength({ min: 3, max: 50 })
-    .withMessage("Location must be between 3 and 50 characters"),
   body("gender").notEmpty().withMessage("Gender is required"),
 ];
 
@@ -53,6 +49,9 @@ router.post("/signup", signupValidation, async (req, res) => {
       bloodType,
       number,
       location,
+      division,
+      district,
+      upazila,
       gender,
       age,
     } = req.body;
@@ -69,6 +68,12 @@ router.post("/signup", signupValidation, async (req, res) => {
       return res.status(400).json({ message: "Username is already taken" });
     }
 
+    // Generate location string from division/district/upazila if provided
+    let finalLocation = location;
+    if (!finalLocation && (division || district || upazila)) {
+      finalLocation = [upazila, district, division].filter(Boolean).join(', ');
+    }
+
     // Create new user
     const user = new User({
       username,
@@ -78,7 +83,10 @@ router.post("/signup", signupValidation, async (req, res) => {
       lastName,
       bloodType,
       number,
-      location,
+      location: finalLocation || '',
+      division: division || '',
+      district: district || '',
+      upazila: upazila || '',
       gender,
       age,
     });

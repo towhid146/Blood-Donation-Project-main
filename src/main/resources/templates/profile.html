@@ -160,6 +160,47 @@
           <!-- Will be populated by JavaScript -->
         </section>
 
+        <!-- Profile Completion Card -->
+        <div id="profile-completion-section" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-user-check text-red-500 mr-3"></i>
+                Profile Completion
+              </h3>
+              <p class="text-sm text-gray-500 mt-1">Complete your profile to get more visibility</p>
+            </div>
+            <div class="text-right">
+              <span id="profileCompletionPercent" class="text-3xl font-bold text-red-600">0%</span>
+              <p class="text-xs text-gray-500">Complete</p>
+            </div>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+            <div id="profileCompletionBar" class="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
+          </div>
+
+          <!-- Missing Fields -->
+          <div id="missingFieldsSection" class="hidden">
+            <p class="text-sm text-gray-600 mb-2">
+              <i class="fas fa-info-circle text-yellow-500 mr-1"></i>
+              Complete these fields to reach 100%:
+            </p>
+            <div id="missingFieldsList" class="flex flex-wrap gap-2">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Completed Message -->
+          <div id="completedMessage" class="hidden">
+            <p class="text-sm text-green-600">
+              <i class="fas fa-check-circle mr-1"></i>
+              Your profile is complete! You're all set to donate and help save lives.
+            </p>
+          </div>
+        </div>
+
         <!-- Stats Grid -->
         <div class="grid md:grid-cols-4 gap-6 mb-8">
           <div

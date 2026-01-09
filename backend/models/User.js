@@ -32,11 +32,28 @@ const userSchema = new mongoose.Schema(
       required: [true, "Blood type is required"],
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
     },
+    // Detailed location fields
+    division: {
+      type: String,
+      default: "",
+    },
+    district: {
+      type: String,
+      default: "",
+    },
+    upazila: {
+      type: String,
+      default: "",
+    },
+    // Legacy location field (for backward compatibility)
     location: {
       type: String,
-      required: [true, "Location is required"],
-      minlength: [3, "Location must be between 3 and 50 characters"],
-      maxlength: [50, "Location must be between 3 and 50 characters"],
+      default: "",
+    },
+    // Full address
+    address: {
+      type: String,
+      default: "",
     },
     password: {
       type: String,
@@ -63,6 +80,30 @@ const userSchema = new mongoose.Schema(
       required: [true, "Gender is required"],
       enum: ["Male", "Female", "Other"],
     },
+    // Profile picture
+    profilePicture: {
+      type: String,
+      default: "",
+    },
+    // Bio/About
+    bio: {
+      type: String,
+      default: "",
+      maxlength: [500, "Bio cannot exceed 500 characters"],
+    },
+    // Medical info
+    weight: {
+      type: Number,
+      default: null,
+    },
+    hasMedicalConditions: {
+      type: Boolean,
+      default: false,
+    },
+    medicalConditions: {
+      type: String,
+      default: "",
+    },
     donationsCount: {
       type: Number,
       default: 0,
@@ -87,11 +128,82 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Virtual for full location string
+userSchema.virtual("fullLocation").get(function () {
+  const parts = [this.upazila, this.district, this.division].filter(Boolean);
+  return parts.join(", ") || this.location || "Not specified";
+});
+
+// Calculate profile completion percentage
+userSchema.methods.calculateProfileCompletion = function () {
+  const fields = [
+    { name: "firstName", weight: 10 },
+    { name: "lastName", weight: 10 },
+    { name: "email", weight: 10 },
+    { name: "number", weight: 10 },
+    { name: "bloodType", weight: 15 },
+    { name: "gender", weight: 5 },
+    { name: "age", weight: 5 },
+    { name: "division", weight: 5 },
+    { name: "district", weight: 5 },
+    { name: "upazila", weight: 5 },
+    { name: "profilePicture", weight: 10 },
+    { name: "bio", weight: 5 },
+    { name: "weight", weight: 5 },
+  ];
+
+  let totalWeight = 0;
+  let completedWeight = 0;
+
+  fields.forEach((field) => {
+    totalWeight += field.weight;
+    const value = this[field.name];
+    if (value !== null && value !== undefined && value !== "") {
+      completedWeight += field.weight;
+    }
+  });
+
+  return Math.round((completedWeight / totalWeight) * 100);
+};
+
+// Get missing profile fields
+userSchema.methods.getMissingFields = function () {
+  const fieldLabels = {
+    firstName: "First Name",
+    lastName: "Last Name",
+    email: "Email",
+    number: "Phone Number",
+    bloodType: "Blood Type",
+    gender: "Gender",
+    age: "Age",
+    division: "Division",
+    district: "District",
+    upazila: "Upazila/Thana",
+    profilePicture: "Profile Picture",
+    bio: "Bio",
+    weight: "Weight",
+  };
+
+  const missing = [];
+  Object.keys(fieldLabels).forEach((field) => {
+    const value = this[field];
+    if (value === null || value === undefined || value === "") {
+      missing.push(fieldLabels[field]);
+    }
+  });
+
+  return missing;
+};
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

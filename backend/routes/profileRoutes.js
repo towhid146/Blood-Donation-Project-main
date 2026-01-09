@@ -18,8 +18,19 @@ router.get("/", isAuthenticated, async (req, res) => {
     const eligibility = await reportService.checkEligibility(req.user._id);
     const recentDonations = await donationService.findByUser(req.user._id);
 
+    // Calculate profile completion
+    const profileCompletion = user.calculateProfileCompletion
+      ? user.calculateProfileCompletion()
+      : 0;
+    const missingFields = user.getMissingFields ? user.getMissingFields() : [];
+
     res.json({
-      user,
+      user: {
+        ...user.toJSON(),
+        profileCompletion,
+        missingFields,
+        fullLocation: user.fullLocation || user.location,
+      },
       eligibility,
       donations: recentDonations.slice(0, 5), // Last 5 donations
     });
@@ -42,9 +53,18 @@ router.put("/", isAuthenticated, async (req, res) => {
       "lastName",
       "number",
       "location",
+      "division",
+      "district",
+      "upazila",
+      "address",
       "bloodType",
       "age",
       "gender",
+      "profilePicture",
+      "bio",
+      "weight",
+      "hasMedicalConditions",
+      "medicalConditions",
     ];
 
     const updateData = {};
@@ -54,10 +74,34 @@ router.put("/", isAuthenticated, async (req, res) => {
       }
     });
 
+    // Auto-generate location string from division/district/upazila
+    if (req.body.upazila || req.body.district || req.body.division) {
+      const parts = [
+        req.body.upazila,
+        req.body.district,
+        req.body.division,
+      ].filter(Boolean);
+      updateData.location = parts.join(", ");
+    }
+
     updateData._id = req.user._id;
 
     const user = await userService.saveUserProfile(updateData);
-    res.json({ message: "Profile updated successfully", user });
+
+    // Return updated profile with completion
+    const profileCompletion = user.calculateProfileCompletion
+      ? user.calculateProfileCompletion()
+      : 0;
+    const missingFields = user.getMissingFields ? user.getMissingFields() : [];
+
+    res.json({
+      message: "Profile updated successfully",
+      user: {
+        ...user.toJSON(),
+        profileCompletion,
+        missingFields,
+      },
+    });
   } catch (error) {
     res
       .status(500)
