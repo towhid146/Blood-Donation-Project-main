@@ -587,10 +587,12 @@
         // Division change - populate districts
         divisionSelect.addEventListener("change", function () {
           const selectedDivision = this.value;
-          
+
           // Reset district and hospital
-          districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
-          hospitalSelect.innerHTML = '<option value="" disabled selected>Select Hospital</option>';
+          districtSelect.innerHTML =
+            '<option value="" disabled selected>Select District</option>';
+          hospitalSelect.innerHTML =
+            '<option value="" disabled selected>Select Hospital</option>';
           hospitalSelect.disabled = true;
           hospitalCount.textContent = "0";
 
@@ -601,7 +603,9 @@
 
           // Populate districts from BD_LOCATIONS
           if (typeof BD_LOCATIONS !== "undefined") {
-            const division = BD_LOCATIONS.divisions.find(d => d.name === selectedDivision);
+            const division = BD_LOCATIONS.divisions.find(
+              (d) => d.name === selectedDivision
+            );
             if (division && division.districts) {
               division.districts.forEach((district) => {
                 const option = document.createElement("option");
@@ -620,7 +624,8 @@
           const selectedDistrict = this.value;
 
           // Reset hospital
-          hospitalSelect.innerHTML = '<option value="" disabled selected>Select Hospital</option>';
+          hospitalSelect.innerHTML =
+            '<option value="" disabled selected>Select Hospital</option>';
 
           if (!selectedDistrict) {
             hospitalSelect.disabled = true;
@@ -630,12 +635,19 @@
 
           // Populate hospitals from BD_HOSPITALS
           if (typeof BD_HOSPITALS !== "undefined") {
-            const hospitals = getHospitalsByDistrict(selectedDivision, selectedDistrict);
-            
+            const hospitals = getHospitalsByDistrict(
+              selectedDivision,
+              selectedDistrict
+            );
+
             if (hospitals.length > 0) {
               // Group by type
-              const govtHospitals = hospitals.filter(h => h.type === "Government");
-              const privateHospitals = hospitals.filter(h => h.type === "Private");
+              const govtHospitals = hospitals.filter(
+                (h) => h.type === "Government"
+              );
+              const privateHospitals = hospitals.filter(
+                (h) => h.type === "Private"
+              );
 
               if (govtHospitals.length > 0) {
                 const govtGroup = document.createElement("optgroup");
