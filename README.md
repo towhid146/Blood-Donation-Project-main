@@ -56,6 +56,7 @@ This project uses GitHub Actions for continuous integration and deployment:
 ### Workflows
 
 1. **CI/CD Pipeline** (`ci-cd.yml`)
+
    - Runs on push to `main` branch
    - Tests the application
    - Security audit

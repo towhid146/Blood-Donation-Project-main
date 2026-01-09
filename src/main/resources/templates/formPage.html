@@ -11,6 +11,8 @@
     />
     <script src="/js/api.js"></script>
     <script src="/js/navbar.js"></script>
+    <script src="/js/bdLocations.js"></script>
+    <script src="/js/bdHospitals.js"></script>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
       * {
@@ -296,10 +298,59 @@
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-5">
+                  <!-- Division -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Division
+                    </label>
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-map"></i>
+                      </span>
+                      <select
+                        id="division"
+                        name="division"
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white"
+                      >
+                        <option value="" disabled selected>
+                          Select Division
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- District -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      District
+                    </label>
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
+                      >
+                        <i class="fas fa-map-marker-alt"></i>
+                      </span>
+                      <select
+                        id="district"
+                        name="district"
+                        disabled
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white disabled:bg-gray-100"
+                      >
+                        <option value="" disabled selected>
+                          Select District
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5">
                   <!-- Hospital -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                      Hospital
+                      Hospital / Clinic
                     </label>
                     <div class="relative">
                       <span
@@ -310,44 +361,35 @@
                       <select
                         id="hospital"
                         name="hospital"
-                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white"
+                        disabled
+                        class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none bg-white disabled:bg-gray-100"
                       >
                         <option value="" disabled selected>
-                          Select Hospital (Optional)
+                          Select Hospital
                         </option>
-                        <option value="Chittagong Medical College">
-                          Chittagong Medical College
-                        </option>
-                        <option value="National Hospital">
-                          National Hospital
-                        </option>
-                        <option value="Imperial Hospital">
-                          Imperial Hospital
-                        </option>
-                        <option value="Medinova Hospital">
-                          Medinova Hospital
-                        </option>
-                        <option value="Other">Other</option>
                       </select>
                     </div>
+                    <p class="text-xs text-gray-400 mt-1">
+                      <span id="hospitalCount">0</span> hospitals available
+                    </p>
                   </div>
 
-                  <!-- Location -->
+                  <!-- Location/Address -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                      Location
+                      Specific Location
                     </label>
                     <div class="relative">
                       <span
                         class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"
                       >
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-location-dot"></i>
                       </span>
                       <input
                         type="text"
                         id="location"
                         name="location"
-                        placeholder="City or Area"
+                        placeholder="Ward, Area, or Address"
                         class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
                       />
                     </div>
@@ -525,6 +567,131 @@
         document.getElementById("mobile-menu").classList.toggle("hidden");
       });
 
+      // Initialize location and hospital dropdowns
+      function initLocationHospitalDropdowns() {
+        const divisionSelect = document.getElementById("division");
+        const districtSelect = document.getElementById("district");
+        const hospitalSelect = document.getElementById("hospital");
+        const hospitalCount = document.getElementById("hospitalCount");
+
+        // Populate divisions from BD_LOCATIONS
+        if (typeof BD_LOCATIONS !== "undefined") {
+          BD_LOCATIONS.divisions.forEach((division) => {
+            const option = document.createElement("option");
+            option.value = division.name;
+            option.textContent = division.name;
+            divisionSelect.appendChild(option);
+          });
+        }
+
+        // Division change - populate districts
+        divisionSelect.addEventListener("change", function () {
+          const selectedDivision = this.value;
+          
+          // Reset district and hospital
+          districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+          hospitalSelect.innerHTML = '<option value="" disabled selected>Select Hospital</option>';
+          hospitalSelect.disabled = true;
+          hospitalCount.textContent = "0";
+
+          if (!selectedDivision) {
+            districtSelect.disabled = true;
+            return;
+          }
+
+          // Populate districts from BD_LOCATIONS
+          if (typeof BD_LOCATIONS !== "undefined") {
+            const division = BD_LOCATIONS.divisions.find(d => d.name === selectedDivision);
+            if (division && division.districts) {
+              division.districts.forEach((district) => {
+                const option = document.createElement("option");
+                option.value = district.name;
+                option.textContent = district.name;
+                districtSelect.appendChild(option);
+              });
+              districtSelect.disabled = false;
+            }
+          }
+        });
+
+        // District change - populate hospitals
+        districtSelect.addEventListener("change", function () {
+          const selectedDivision = divisionSelect.value;
+          const selectedDistrict = this.value;
+
+          // Reset hospital
+          hospitalSelect.innerHTML = '<option value="" disabled selected>Select Hospital</option>';
+
+          if (!selectedDistrict) {
+            hospitalSelect.disabled = true;
+            hospitalCount.textContent = "0";
+            return;
+          }
+
+          // Populate hospitals from BD_HOSPITALS
+          if (typeof BD_HOSPITALS !== "undefined") {
+            const hospitals = getHospitalsByDistrict(selectedDivision, selectedDistrict);
+            
+            if (hospitals.length > 0) {
+              // Group by type
+              const govtHospitals = hospitals.filter(h => h.type === "Government");
+              const privateHospitals = hospitals.filter(h => h.type === "Private");
+
+              if (govtHospitals.length > 0) {
+                const govtGroup = document.createElement("optgroup");
+                govtGroup.label = "🏥 Government Hospitals";
+                govtHospitals.forEach((hospital) => {
+                  const option = document.createElement("option");
+                  option.value = hospital.name;
+                  option.textContent = hospital.name;
+                  govtGroup.appendChild(option);
+                });
+                hospitalSelect.appendChild(govtGroup);
+              }
+
+              if (privateHospitals.length > 0) {
+                const privateGroup = document.createElement("optgroup");
+                privateGroup.label = "🏨 Private Hospitals & Clinics";
+                privateHospitals.forEach((hospital) => {
+                  const option = document.createElement("option");
+                  option.value = hospital.name;
+                  option.textContent = hospital.name;
+                  privateGroup.appendChild(option);
+                });
+                hospitalSelect.appendChild(privateGroup);
+              }
+
+              // Add "Other" option
+              const otherOption = document.createElement("option");
+              otherOption.value = "Other";
+              otherOption.textContent = "Other (Specify in notes)";
+              hospitalSelect.appendChild(otherOption);
+
+              hospitalSelect.disabled = false;
+              hospitalCount.textContent = hospitals.length;
+            } else {
+              // No hospitals found for this district
+              const noOption = document.createElement("option");
+              noOption.value = "";
+              noOption.textContent = "No hospitals in database";
+              noOption.disabled = true;
+              hospitalSelect.appendChild(noOption);
+
+              const otherOption = document.createElement("option");
+              otherOption.value = "Other";
+              otherOption.textContent = "Other (Specify in notes)";
+              hospitalSelect.appendChild(otherOption);
+
+              hospitalSelect.disabled = false;
+              hospitalCount.textContent = "0";
+            }
+          }
+        });
+      }
+
+      // Initialize on page load
+      initLocationHospitalDropdowns();
+
       // Load user info if logged in
       async function loadUserInfo() {
         try {
@@ -593,6 +760,8 @@
           const formData = {
             bloodGroupNeeded: document.getElementById("bloodType").value,
             patientName: document.getElementById("patientName").value,
+            division: document.getElementById("division").value,
+            district: document.getElementById("district").value,
             hospital: document.getElementById("hospital").value,
             location: document.getElementById("location").value,
             volumeNeeded: document.getElementById("volumeNeeded").value || 450,
