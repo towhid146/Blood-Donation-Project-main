@@ -1,7 +1,7 @@
 /**
  * Database Seed Script
  * Run: node backend/seed.js
- * 
+ *
  * This script creates dummy users and blood requests for testing
  */
 
@@ -229,6 +229,7 @@ const dummyUsers = [
     lastDonationDate: null,
     isEnabled: true,
     isVerified: true,
+    isAdmin: true,
   },
 ];
 
@@ -332,7 +333,8 @@ async function seedDatabase() {
 
       // Calculate response ratio
       const total = userData.completedRequests + userData.missedRequests;
-      const responseRatio = total > 0 ? (userData.completedRequests / total) * 100 : 0;
+      const responseRatio =
+        total > 0 ? (userData.completedRequests / total) * 100 : 0;
 
       const user = new User({
         ...userData,
@@ -389,7 +391,9 @@ async function seedDatabase() {
     console.log("----------------------------------------\n");
 
     console.log("📍 Users by Location:");
-    console.log("  - Dhaka: donor1, donor2, donor5, requester1, testuser, admin");
+    console.log(
+      "  - Dhaka: donor1, donor2, donor5, requester1, testuser, admin"
+    );
     console.log("  - Gazipur: donor3");
     console.log("  - Chittagong: donor4");
     console.log("  - Rajshahi: donor6");

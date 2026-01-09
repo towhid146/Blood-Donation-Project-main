@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - BDMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/api.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .blood-drop {
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        position: relative;
+      }
+      .blood-drop::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+      }
+      .sidebar-link.active {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: #dc2626;
+        border-right: 3px solid #dc2626;
+      }
+      .stat-card {
+        transition: all 0.3s ease;
+      }
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Access Denied Screen (shown if not admin) -->
+    <div
+      id="access-denied"
+      class="hidden fixed inset-0 bg-white z-50 flex items-center justify-center"
+    >
+      <div class="text-center p-8">
+        <div
+          class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6"
+        >
+          <i class="fas fa-shield-alt text-4xl text-red-500"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+        <p class="text-gray-500 mb-6">
+          You don't have permission to access the admin panel.
+        </p>
+        <a
+          href="/homePage"
+          class="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          <i class="fas fa-home mr-2"></i>Go to Home
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div
+      id="loading-screen"
+      class="fixed inset-0 bg-white z-40 flex items-center justify-center"
+    >
+      <div class="text-center">
+        <i class="fas fa-spinner fa-spin text-4xl text-red-600 mb-4"></i>
+        <p class="text-gray-500">Loading admin panel...</p>
+      </div>
+    </div>
+
+    <div id="admin-content" class="hidden">
+      <!-- Sidebar -->
+      <aside class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-30">
+        <div class="p-6 border-b">
+          <a href="/homePage" class="flex items-center space-x-2">
+            <div class="blood-drop w-8 h-10"></div>
+            <span class="text-xl font-bold text-gray-900"
+              >BD<span class="text-red-600">MS</span></span
+            >
+          </a>
+          <p class="text-xs text-gray-400 mt-1">Admin Panel</p>
+        </div>
+
+        <nav class="p-4 space-y-1">
+          <a
+            href="#dashboard"
+            onclick="showSection('dashboard')"
+            class="sidebar-link active flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-chart-pie w-5 mr-3"></i>Dashboard
+          </a>
+          <a
+            href="#users"
+            onclick="showSection('users')"
+            class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-users w-5 mr-3"></i>Users
+          </a>
+          <a
+            href="#requests"
+            onclick="showSection('requests')"
+            class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-hand-holding-medical w-5 mr-3"></i>Blood Requests
+          </a>
+          <a
+            href="#responses"
+            onclick="showSection('responses')"
+            class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-reply w-5 mr-3"></i>Donor Responses
+          </a>
+          <a
+            href="#system"
+            onclick="showSection('system')"
+            class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-cog w-5 mr-3"></i>System
+          </a>
+        </nav>
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t bg-gray-50">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-user-shield text-red-600"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-gray-900 truncate" id="admin-name">
+                Admin
+              </p>
+              <p class="text-xs text-gray-500">Administrator</p>
+            </div>
+          </div>
+          <a
+            href="/homePage"
+            class="mt-3 flex items-center justify-center px-4 py-2 text-sm text-gray-600 hover:text-red-600 border rounded-lg hover:border-red-200 transition"
+          >
+            <i class="fas fa-arrow-left mr-2"></i>Back to Site
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="ml-64 min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-20">
+          <div class="px-8 py-4 flex items-center justify-between">
+            <h1 class="text-xl font-bold text-gray-900" id="page-title">
+              Dashboard
+            </h1>
+            <div class="flex items-center space-x-4">
+              <button
+                onclick="refreshData()"
+                class="text-gray-500 hover:text-red-600 transition"
+                title="Refresh"
+              >
+                <i class="fas fa-sync-alt"></i>
+              </button>
+              <span class="text-sm text-gray-500" id="last-updated"
+                >Last updated: --</span
+              >
+            </div>
+          </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section id="section-dashboard" class="p-8">
+          <!-- Stats Cards -->
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          >
+            <div
+              class="stat-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-users text-blue-600 text-xl"></i>
+                </div>
+                <span
+                  class="text-xs font-medium text-green-500 bg-green-50 px-2 py-1 rounded-full"
+                  id="stat-users-change"
+                  >--</span
+                >
+              </div>
+              <h3
+                class="text-3xl font-bold text-gray-900"
+                id="stat-total-users"
+              >
+                --
+              </h3>
+              <p class="text-gray-500 text-sm">Total Users</p>
+            </div>
+
+            <div
+              class="stat-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-tint text-red-600 text-xl"></i>
+                </div>
+                <span
+                  class="text-xs font-medium text-red-500 bg-red-50 px-2 py-1 rounded-full"
+                  id="stat-critical"
+                  >--</span
+                >
+              </div>
+              <h3
+                class="text-3xl font-bold text-gray-900"
+                id="stat-active-requests"
+              >
+                --
+              </h3>
+              <p class="text-gray-500 text-sm">Active Requests</p>
+            </div>
+
+            <div
+              class="stat-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-heart text-green-600 text-xl"></i>
+                </div>
+              </div>
+              <h3 class="text-3xl font-bold text-gray-900" id="stat-donations">
+                --
+              </h3>
+              <p class="text-gray-500 text-sm">Total Donations</p>
+            </div>
+
+            <div
+              class="stat-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-check-circle text-purple-600 text-xl"></i>
+                </div>
+              </div>
+              <h3 class="text-3xl font-bold text-gray-900" id="stat-fulfilled">
+                --
+              </h3>
+              <p class="text-gray-500 text-sm">Fulfilled Requests</p>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div
+              class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <h3 class="font-semibold text-gray-900 mb-4">
+                Blood Type Distribution
+              </h3>
+              <canvas id="bloodTypeChart" height="200"></canvas>
+            </div>
+            <div
+              class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <h3 class="font-semibold text-gray-900 mb-4">
+                Users by Division
+              </h3>
+              <canvas id="locationChart" height="200"></canvas>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div
+            class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+          >
+            <h3 class="font-semibold text-gray-900 mb-4">
+              Recent Activity (Last 7 Days)
+            </h3>
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div class="p-4 bg-blue-50 rounded-xl">
+                <p class="text-2xl font-bold text-blue-600" id="recent-users">
+                  --
+                </p>
+                <p class="text-sm text-gray-500">New Users</p>
+              </div>
+              <div class="p-4 bg-red-50 rounded-xl">
+                <p class="text-2xl font-bold text-red-600" id="recent-requests">
+                  --
+                </p>
+                <p class="text-sm text-gray-500">New Requests</p>
+              </div>
+              <div class="p-4 bg-green-50 rounded-xl">
+                <p
+                  class="text-2xl font-bold text-green-600"
+                  id="recent-responses"
+                >
+                  --
+                </p>
+                <p class="text-sm text-gray-500">Donor Responses</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="section-users" class="hidden p-8">
+          <!-- Filters -->
+          <div
+            class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6"
+          >
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <input
+                type="text"
+                id="user-search"
+                placeholder="Search users..."
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+              <select
+                id="user-blood-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Blood Types</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+              <select
+                id="user-status-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="disabled">Disabled</option>
+                <option value="verified">Verified</option>
+                <option value="unverified">Unverified</option>
+              </select>
+              <select
+                id="user-division-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Divisions</option>
+                <option value="Dhaka">Dhaka</option>
+                <option value="Chittagong">Chittagong</option>
+                <option value="Rajshahi">Rajshahi</option>
+                <option value="Khulna">Khulna</option>
+                <option value="Barisal">Barisal</option>
+                <option value="Sylhet">Sylhet</option>
+                <option value="Rangpur">Rangpur</option>
+                <option value="Mymensingh">Mymensingh</option>
+              </select>
+              <button
+                onclick="loadUsers()"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                <i class="fas fa-search mr-2"></i>Search
+              </button>
+            </div>
+          </div>
+
+          <!-- Users Table -->
+          <div
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                  <tr>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      User
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Blood
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Location
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Donations
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body" class="divide-y">
+                  <!-- Users will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+            <div
+              id="users-pagination"
+              class="px-6 py-4 border-t bg-gray-50 flex items-center justify-between"
+            >
+              <!-- Pagination will be loaded here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Blood Requests Section -->
+        <section id="section-requests" class="hidden p-8">
+          <!-- Filters -->
+          <div
+            class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6"
+          >
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <select
+                id="request-status-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="fulfilled">Fulfilled</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="expired">Expired</option>
+              </select>
+              <select
+                id="request-urgency-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Urgency</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="normal">Normal</option>
+                <option value="low">Low</option>
+              </select>
+              <select
+                id="request-blood-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Blood Types</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+              <select
+                id="request-division-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Divisions</option>
+                <option value="Dhaka">Dhaka</option>
+                <option value="Chittagong">Chittagong</option>
+                <option value="Rajshahi">Rajshahi</option>
+                <option value="Khulna">Khulna</option>
+                <option value="Barisal">Barisal</option>
+                <option value="Sylhet">Sylhet</option>
+                <option value="Rangpur">Rangpur</option>
+                <option value="Mymensingh">Mymensingh</option>
+              </select>
+              <button
+                onclick="loadRequests()"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                <i class="fas fa-search mr-2"></i>Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- Requests Table -->
+          <div
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                  <tr>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Patient
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Blood
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Location
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Urgency
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Responses
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="requests-table-body" class="divide-y">
+                  <!-- Requests will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+            <div
+              id="requests-pagination"
+              class="px-6 py-4 border-t bg-gray-50 flex items-center justify-between"
+            >
+              <!-- Pagination will be loaded here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Donor Responses Section -->
+        <section id="section-responses" class="hidden p-8">
+          <div
+            class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6"
+          >
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <select
+                id="response-status-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="accepted">Accepted</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <select
+                id="response-willing-filter"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Responses</option>
+                <option value="true">Willing to Donate</option>
+                <option value="false">Not Willing</option>
+              </select>
+              <button
+                onclick="loadResponses()"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                <i class="fas fa-search mr-2"></i>Filter
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                  <tr>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Donor
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Request
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Willing
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase"
+                    >
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="responses-table-body" class="divide-y">
+                  <!-- Responses will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+            <div
+              id="responses-pagination"
+              class="px-6 py-4 border-t bg-gray-50 flex items-center justify-between"
+            >
+              <!-- Pagination will be loaded here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- System Section -->
+        <section id="section-system" class="hidden p-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Quick Actions -->
+            <div
+              class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <h3 class="font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <div class="space-y-3">
+                <button
+                  onclick="cleanupExpired()"
+                  class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition"
+                >
+                  <span class="flex items-center">
+                    <i class="fas fa-broom w-5 text-gray-500 mr-3"></i>
+                    Cleanup Expired Requests
+                  </span>
+                  <i class="fas fa-chevron-right text-gray-400"></i>
+                </button>
+                <button
+                  onclick="exportData('users')"
+                  class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition"
+                >
+                  <span class="flex items-center">
+                    <i class="fas fa-download w-5 text-gray-500 mr-3"></i>
+                    Export Users Data
+                  </span>
+                  <i class="fas fa-chevron-right text-gray-400"></i>
+                </button>
+                <button
+                  onclick="exportData('requests')"
+                  class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition"
+                >
+                  <span class="flex items-center">
+                    <i class="fas fa-download w-5 text-gray-500 mr-3"></i>
+                    Export Requests Data
+                  </span>
+                  <i class="fas fa-chevron-right text-gray-400"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- System Info -->
+            <div
+              class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <h3 class="font-semibold text-gray-900 mb-4">
+                System Information
+              </h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b">
+                  <span class="text-gray-500">Version</span>
+                  <span class="font-medium text-gray-900">1.2.0</span>
+                </div>
+                <div class="flex justify-between py-2 border-b">
+                  <span class="text-gray-500">Environment</span>
+                  <span class="font-medium text-gray-900">Production</span>
+                </div>
+                <div class="flex justify-between py-2 border-b">
+                  <span class="text-gray-500">Database</span>
+                  <span class="font-medium text-green-600">Connected</span>
+                </div>
+                <div class="flex justify-between py-2">
+                  <span class="text-gray-500">Last Deployment</span>
+                  <span class="font-medium text-gray-900" id="last-deploy"
+                    >--</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Broadcast Message -->
+            <div
+              class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 md:col-span-2"
+            >
+              <h3 class="font-semibold text-gray-900 mb-4">
+                Broadcast Notification
+              </h3>
+              <form id="broadcast-form" class="space-y-4">
+                <input
+                  type="text"
+                  id="broadcast-title"
+                  placeholder="Notification Title"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+                <textarea
+                  id="broadcast-message"
+                  rows="3"
+                  placeholder="Notification message..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                ></textarea>
+                <button
+                  type="submit"
+                  class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                >
+                  <i class="fas fa-paper-plane mr-2"></i>Send to All Users
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- User Edit Modal -->
+    <div
+      id="user-modal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div class="p-6 border-b flex items-center justify-between">
+          <h3 class="text-xl font-bold text-gray-900">Edit User</h3>
+          <button
+            onclick="closeUserModal()"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        <form id="edit-user-form" class="p-6 space-y-4">
+          <input type="hidden" id="edit-user-id" />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >First Name</label
+              >
+              <input
+                type="text"
+                id="edit-firstName"
+                class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Last Name</label
+              >
+              <input
+                type="text"
+                id="edit-lastName"
+                class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Email</label
+            >
+            <input
+              type="email"
+              id="edit-email"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Phone</label
+            >
+            <input
+              type="text"
+              id="edit-number"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Blood Type</label
+              >
+              <select
+                id="edit-bloodType"
+                class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Donations Count</label
+              >
+              <input
+                type="number"
+                id="edit-donationsCount"
+                class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            class="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          >
+            <i class="fas fa-save mr-2"></i>Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let currentUser = null;
+      let bloodTypeChart = null;
+      let locationChart = null;
+
+      // Check admin access
+      async function checkAdminAccess() {
+        try {
+          const data = await api.getProfile();
+          if (!data.user || !data.user.isAdmin) {
+            document.getElementById("loading-screen").classList.add("hidden");
+            document.getElementById("access-denied").classList.remove("hidden");
+            return false;
+          }
+          currentUser = data.user;
+          document.getElementById("admin-name").textContent =
+            currentUser.firstName || currentUser.username;
+          return true;
+        } catch (error) {
+          document.getElementById("loading-screen").classList.add("hidden");
+          document.getElementById("access-denied").classList.remove("hidden");
+          return false;
+        }
+      }
+
+      // Initialize admin panel
+      async function init() {
+        const isAdmin = await checkAdminAccess();
+        if (!isAdmin) return;
+
+        document.getElementById("loading-screen").classList.add("hidden");
+        document.getElementById("admin-content").classList.remove("hidden");
+
+        loadDashboard();
+        updateLastUpdated();
+      }
+
+      // Show section
+      function showSection(section) {
+        // Hide all sections
+        document
+          .querySelectorAll("section[id^='section-']")
+          .forEach((s) => s.classList.add("hidden"));
+        // Show selected section
+        document
+          .getElementById(`section-${section}`)
+          .classList.remove("hidden");
+
+        // Update sidebar active state
+        document
+          .querySelectorAll(".sidebar-link")
+          .forEach((link) => link.classList.remove("active"));
+        document.querySelector(`a[href="#${section}"]`).classList.add("active");
+
+        // Update page title
+        const titles = {
+          dashboard: "Dashboard",
+          users: "User Management",
+          requests: "Blood Requests",
+          responses: "Donor Responses",
+          system: "System Settings",
+        };
+        document.getElementById("page-title").textContent =
+          titles[section] || "Admin Panel";
+
+        // Load section data
+        switch (section) {
+          case "dashboard":
+            loadDashboard();
+            break;
+          case "users":
+            loadUsers();
+            break;
+          case "requests":
+            loadRequests();
+            break;
+          case "responses":
+            loadResponses();
+            break;
+        }
+      }
+
+      // Load dashboard data
+      async function loadDashboard() {
+        try {
+          const response = await fetch("/api/admin/stats", {
+            credentials: "include",
+          });
+          const data = await response.json();
+
+          // Update stats
+          document.getElementById("stat-total-users").textContent =
+            data.users.total;
+          document.getElementById(
+            "stat-users-change"
+          ).textContent = `+${data.users.newThisWeek} this week`;
+          document.getElementById("stat-active-requests").textContent =
+            data.requests.active;
+          document.getElementById(
+            "stat-critical"
+          ).textContent = `${data.requests.critical} critical`;
+          document.getElementById("stat-donations").textContent =
+            data.donations.total;
+          document.getElementById("stat-fulfilled").textContent =
+            data.requests.fulfilled;
+
+          // Recent activity
+          document.getElementById("recent-users").textContent =
+            data.recentActivity.users;
+          document.getElementById("recent-requests").textContent =
+            data.recentActivity.requests;
+          document.getElementById("recent-responses").textContent =
+            data.recentActivity.responses;
+
+          // Blood type chart
+          renderBloodTypeChart(data.bloodTypes);
+
+          // Location chart
+          renderLocationChart(data.locations);
+
+          updateLastUpdated();
+        } catch (error) {
+          console.error("Error loading dashboard:", error);
+        }
+      }
+
+      // Render blood type chart
+      function renderBloodTypeChart(bloodTypes) {
+        const ctx = document.getElementById("bloodTypeChart").getContext("2d");
+
+        if (bloodTypeChart) bloodTypeChart.destroy();
+
+        bloodTypeChart = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: bloodTypes.map((b) => b._id),
+            datasets: [
+              {
+                data: bloodTypes.map((b) => b.count),
+                backgroundColor: [
+                  "#ef4444",
+                  "#f97316",
+                  "#eab308",
+                  "#22c55e",
+                  "#3b82f6",
+                  "#8b5cf6",
+                  "#ec4899",
+                  "#6b7280",
+                ],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: "right" },
+            },
+          },
+        });
+      }
+
+      // Render location chart
+      function renderLocationChart(locations) {
+        const ctx = document.getElementById("locationChart").getContext("2d");
+
+        if (locationChart) locationChart.destroy();
+
+        locationChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: locations.map((l) => l._id),
+            datasets: [
+              {
+                label: "Users",
+                data: locations.map((l) => l.count),
+                backgroundColor: "#ef4444",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+
+      // Load users
+      async function loadUsers(page = 1) {
+        try {
+          const search = document.getElementById("user-search").value;
+          const bloodType = document.getElementById("user-blood-filter").value;
+          const status = document.getElementById("user-status-filter").value;
+          const division = document.getElementById(
+            "user-division-filter"
+          ).value;
+
+          const params = new URLSearchParams({
+            page,
+            limit: 20,
+            search,
+            bloodType,
+            status,
+            division,
+          });
+          const response = await fetch(`/api/admin/users?${params}`, {
+            credentials: "include",
+          });
+          const data = await response.json();
+
+          renderUsersTable(data.users);
+          renderPagination("users", data.pagination, loadUsers);
+        } catch (error) {
+          console.error("Error loading users:", error);
+        }
+      }
+
+      // Render users table
+      function renderUsersTable(users) {
+        const tbody = document.getElementById("users-table-body");
+
+        if (users.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No users found</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = users
+          .map(
+            (user) => `
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <span class="font-medium text-red-600">${(
+                    user.firstName?.[0] || user.username[0]
+                  ).toUpperCase()}</span>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900">${
+                    user.firstName || ""
+                  } ${user.lastName || ""}</p>
+                  <p class="text-sm text-gray-500">@${user.username}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 bg-red-100 text-red-700 text-sm font-medium rounded">${
+                user.bloodType
+              }</span>
+            </td>
+            <td class="px-6 py-4 text-gray-500">${
+              user.district || user.division || "N/A"
+            }</td>
+            <td class="px-6 py-4 text-gray-900 font-medium">${
+              user.donationsCount || 0
+            }</td>
+            <td class="px-6 py-4">
+              <div class="flex flex-col space-y-1">
+                <span class="px-2 py-0.5 text-xs font-medium rounded-full ${
+                  user.isEnabled
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }">
+                  ${user.isEnabled ? "Active" : "Disabled"}
+                </span>
+                ${
+                  user.isVerified
+                    ? '<span class="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700">Verified</span>'
+                    : ""
+                }
+                ${
+                  user.isAdmin
+                    ? '<span class="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700">Admin</span>'
+                    : ""
+                }
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex items-center space-x-2">
+                <button onclick='editUser(${JSON.stringify(user).replace(
+                  /'/g,
+                  "\\'"
+                )})' class="p-2 text-gray-400 hover:text-blue-600" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="toggleUserStatus('${
+                  user._id
+                }')" class="p-2 text-gray-400 hover:text-yellow-600" title="${
+              user.isEnabled ? "Disable" : "Enable"
+            }">
+                  <i class="fas fa-${user.isEnabled ? "ban" : "check"}"></i>
+                </button>
+                <button onclick="toggleUserVerified('${
+                  user._id
+                }')" class="p-2 text-gray-400 hover:text-blue-600" title="${
+              user.isVerified ? "Unverify" : "Verify"
+            }">
+                  <i class="fas fa-${
+                    user.isVerified ? "times-circle" : "check-circle"
+                  }"></i>
+                </button>
+                <button onclick="toggleUserAdmin('${
+                  user._id
+                }')" class="p-2 text-gray-400 hover:text-purple-600" title="${
+              user.isAdmin ? "Remove Admin" : "Make Admin"
+            }">
+                  <i class="fas fa-user-shield"></i>
+                </button>
+                <button onclick="deleteUser('${
+                  user._id
+                }')" class="p-2 text-gray-400 hover:text-red-600" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `
+          )
+          .join("");
+      }
+
+      // Load blood requests
+      async function loadRequests(page = 1) {
+        try {
+          const status = document.getElementById("request-status-filter").value;
+          const urgency = document.getElementById(
+            "request-urgency-filter"
+          ).value;
+          const bloodType = document.getElementById(
+            "request-blood-filter"
+          ).value;
+          const division = document.getElementById(
+            "request-division-filter"
+          ).value;
+
+          const params = new URLSearchParams({
+            page,
+            limit: 20,
+            status,
+            urgency,
+            bloodType,
+            division,
+          });
+          const response = await fetch(`/api/admin/requests?${params}`, {
+            credentials: "include",
+          });
+          const data = await response.json();
+
+          renderRequestsTable(data.requests);
+          renderPagination("requests", data.pagination, loadRequests);
+        } catch (error) {
+          console.error("Error loading requests:", error);
+        }
+      }
+
+      // Render requests table
+      function renderRequestsTable(requests) {
+        const tbody = document.getElementById("requests-table-body");
+
+        const urgencyColors = {
+          critical: "bg-red-100 text-red-700",
+          high: "bg-orange-100 text-orange-700",
+          normal: "bg-yellow-100 text-yellow-700",
+          low: "bg-green-100 text-green-700",
+        };
+
+        const statusColors = {
+          active: "bg-green-100 text-green-700",
+          fulfilled: "bg-blue-100 text-blue-700",
+          cancelled: "bg-gray-100 text-gray-700",
+          expired: "bg-red-100 text-red-700",
+        };
+
+        if (requests.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">No requests found</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = requests
+          .map(
+            (req) => `
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <p class="font-medium text-gray-900">${req.patientName}</p>
+              <p class="text-sm text-gray-500">${
+                req.hospital || "No hospital"
+              }</p>
+            </td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 bg-red-100 text-red-700 text-sm font-medium rounded">${
+                req.bloodType
+              }</span>
+            </td>
+            <td class="px-6 py-4 text-gray-500">${req.district}, ${
+              req.division
+            }</td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 text-xs font-medium rounded-full ${
+                urgencyColors[req.urgency]
+              }">${req.urgency}</span>
+            </td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 text-xs font-medium rounded-full ${
+                statusColors[req.status]
+              }">${req.status}</span>
+            </td>
+            <td class="px-6 py-4 text-gray-900">${req.respondedDonors || 0}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center space-x-2">
+                <select onchange="updateRequestStatus('${
+                  req._id
+                }', this.value)" class="text-sm border rounded px-2 py-1">
+                  <option value="active" ${
+                    req.status === "active" ? "selected" : ""
+                  }>Active</option>
+                  <option value="fulfilled" ${
+                    req.status === "fulfilled" ? "selected" : ""
+                  }>Fulfilled</option>
+                  <option value="cancelled" ${
+                    req.status === "cancelled" ? "selected" : ""
+                  }>Cancelled</option>
+                  <option value="expired" ${
+                    req.status === "expired" ? "selected" : ""
+                  }>Expired</option>
+                </select>
+                <button onclick="deleteRequest('${
+                  req._id
+                }')" class="p-2 text-gray-400 hover:text-red-600" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `
+          )
+          .join("");
+      }
+
+      // Load donor responses
+      async function loadResponses(page = 1) {
+        try {
+          const status = document.getElementById(
+            "response-status-filter"
+          ).value;
+          const willing = document.getElementById(
+            "response-willing-filter"
+          ).value;
+
+          const params = new URLSearchParams({
+            page,
+            limit: 20,
+            status,
+            willing,
+          });
+          const response = await fetch(`/api/admin/responses?${params}`, {
+            credentials: "include",
+          });
+          const data = await response.json();
+
+          renderResponsesTable(data.responses);
+          renderPagination("responses", data.pagination, loadResponses);
+        } catch (error) {
+          console.error("Error loading responses:", error);
+        }
+      }
+
+      // Render responses table
+      function renderResponsesTable(responses) {
+        const tbody = document.getElementById("responses-table-body");
+
+        if (responses.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No responses found</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = responses
+          .map(
+            (res) => `
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <p class="font-medium text-gray-900">${
+                res.donor?.firstName || ""
+              } ${res.donor?.lastName || ""}</p>
+              <p class="text-sm text-gray-500">${
+                res.donor?.bloodType || ""
+              } • ${res.donor?.number || ""}</p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-gray-900">${
+                res.bloodRequest?.patientName || "N/A"
+              }</p>
+              <p class="text-sm text-gray-500">${
+                res.bloodRequest?.bloodType || ""
+              }</p>
+            </td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 text-xs font-medium rounded-full ${
+                res.isWilling
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }">
+                ${res.isWilling ? "Yes" : "No"}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">${
+                res.status
+              }</span>
+            </td>
+            <td class="px-6 py-4 text-gray-500 text-sm">${new Date(
+              res.createdAt
+            ).toLocaleDateString()}</td>
+          </tr>
+        `
+          )
+          .join("");
+      }
+
+      // Render pagination
+      function renderPagination(type, pagination, loadFn) {
+        const container = document.getElementById(`${type}-pagination`);
+        container.innerHTML = `
+          <p class="text-sm text-gray-500">Showing ${
+            (pagination.current - 1) * pagination.limit + 1
+          } to ${Math.min(
+          pagination.current * pagination.limit,
+          pagination.total
+        )} of ${pagination.total}</p>
+          <div class="flex space-x-2">
+            <button ${pagination.current === 1 ? "disabled" : ""} onclick="${
+          loadFn.name
+        }(${pagination.current - 1})" class="px-3 py-1 border rounded text-sm ${
+          pagination.current === 1 ? "text-gray-300" : "hover:bg-gray-100"
+        }">Previous</button>
+            <button ${
+              pagination.current === pagination.pages ? "disabled" : ""
+            } onclick="${loadFn.name}(${
+          pagination.current + 1
+        })" class="px-3 py-1 border rounded text-sm ${
+          pagination.current === pagination.pages
+            ? "text-gray-300"
+            : "hover:bg-gray-100"
+        }">Next</button>
+          </div>
+        `;
+      }
+
+      // User actions
+      function editUser(user) {
+        document.getElementById("edit-user-id").value = user._id;
+        document.getElementById("edit-firstName").value = user.firstName || "";
+        document.getElementById("edit-lastName").value = user.lastName || "";
+        document.getElementById("edit-email").value = user.email || "";
+        document.getElementById("edit-number").value = user.number || "";
+        document.getElementById("edit-bloodType").value = user.bloodType;
+        document.getElementById("edit-donationsCount").value =
+          user.donationsCount || 0;
+        document.getElementById("user-modal").classList.remove("hidden");
+      }
+
+      function closeUserModal() {
+        document.getElementById("user-modal").classList.add("hidden");
+      }
+
+      document
+        .getElementById("edit-user-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const id = document.getElementById("edit-user-id").value;
+          const data = {
+            firstName: document.getElementById("edit-firstName").value,
+            lastName: document.getElementById("edit-lastName").value,
+            email: document.getElementById("edit-email").value,
+            number: document.getElementById("edit-number").value,
+            bloodType: document.getElementById("edit-bloodType").value,
+            donationsCount: parseInt(
+              document.getElementById("edit-donationsCount").value
+            ),
+          };
+
+          try {
+            await fetch(`/api/admin/users/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify(data),
+            });
+            closeUserModal();
+            loadUsers();
+            alert("User updated successfully");
+          } catch (error) {
+            alert("Error updating user");
+          }
+        });
+
+      async function toggleUserStatus(id) {
+        if (!confirm("Toggle user status?")) return;
+        try {
+          await fetch(`/api/admin/users/${id}/toggle-status`, {
+            method: "PATCH",
+            credentials: "include",
+          });
+          loadUsers();
+        } catch (error) {
+          alert("Error updating user");
+        }
+      }
+
+      async function toggleUserVerified(id) {
+        if (!confirm("Toggle verification status?")) return;
+        try {
+          await fetch(`/api/admin/users/${id}/toggle-verified`, {
+            method: "PATCH",
+            credentials: "include",
+          });
+          loadUsers();
+        } catch (error) {
+          alert("Error updating user");
+        }
+      }
+
+      async function toggleUserAdmin(id) {
+        if (!confirm("Toggle admin status? This is a sensitive action."))
+          return;
+        try {
+          await fetch(`/api/admin/users/${id}/toggle-admin`, {
+            method: "PATCH",
+            credentials: "include",
+          });
+          loadUsers();
+        } catch (error) {
+          alert("Error updating user");
+        }
+      }
+
+      async function deleteUser(id) {
+        if (
+          !confirm(
+            "Delete this user and all their data? This cannot be undone."
+          )
+        )
+          return;
+        try {
+          await fetch(`/api/admin/users/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+          loadUsers();
+        } catch (error) {
+          alert("Error deleting user");
+        }
+      }
+
+      // Request actions
+      async function updateRequestStatus(id, status) {
+        try {
+          await fetch(`/api/admin/requests/${id}/status`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ status }),
+          });
+        } catch (error) {
+          alert("Error updating request");
+          loadRequests();
+        }
+      }
+
+      async function deleteRequest(id) {
+        if (!confirm("Delete this request? This cannot be undone.")) return;
+        try {
+          await fetch(`/api/admin/requests/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+          loadRequests();
+        } catch (error) {
+          alert("Error deleting request");
+        }
+      }
+
+      // System actions
+      async function cleanupExpired() {
+        try {
+          const response = await fetch("/api/admin/cleanup-expired", {
+            method: "POST",
+            credentials: "include",
+          });
+          const data = await response.json();
+          alert(data.message);
+          loadDashboard();
+        } catch (error) {
+          alert("Error cleaning up");
+        }
+      }
+
+      async function exportData(type) {
+        try {
+          const response = await fetch(`/api/admin/export/${type}`, {
+            credentials: "include",
+          });
+          const data = await response.json();
+
+          const blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json",
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${type}-export-${
+            new Date().toISOString().split("T")[0]
+          }.json`;
+          a.click();
+        } catch (error) {
+          alert("Error exporting data");
+        }
+      }
+
+      document
+        .getElementById("broadcast-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const title = document.getElementById("broadcast-title").value;
+          const message = document.getElementById("broadcast-message").value;
+
+          try {
+            const response = await fetch("/api/admin/notify-all", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ title, message }),
+            });
+            const data = await response.json();
+            alert(data.message);
+            this.reset();
+          } catch (error) {
+            alert("Error sending notification");
+          }
+        });
+
+      // Refresh data
+      function refreshData() {
+        const activeSection = document
+          .querySelector("section:not(.hidden)")
+          .id.replace("section-", "");
+        showSection(activeSection);
+      }
+
+      function updateLastUpdated() {
+        document.getElementById(
+          "last-updated"
+        ).textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        document.getElementById("last-deploy").textContent =
+          new Date().toLocaleDateString();
+      }
+
+      // Initialize on load
+      init();
+    </script>
+  </body>
+</html>

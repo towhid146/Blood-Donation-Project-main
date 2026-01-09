@@ -19,6 +19,7 @@ const hbcRoutes = require("./routes/hbcRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const bloodRequestRoutes = require("./routes/bloodRequestRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 // Import passport config
 require("./config/passport");
@@ -159,6 +160,10 @@ app.get("/requestDetails/:id", (req, res) => {
   res.sendFile(path.join(templatesDir, "requestDetails.html"));
 });
 
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(templatesDir, "adminPanel.html"));
+});
+
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -169,6 +174,7 @@ app.use("/api/hbc", hbcRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/blood-requests", bloodRequestRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -181,6 +187,7 @@ app.get("/getUserStatus", (req, res) => {
     res.json({
       loggedIn: true,
       username: req.user.username,
+      isAdmin: req.user.isAdmin || false,
     });
   } else {
     res.json({ loggedIn: false });

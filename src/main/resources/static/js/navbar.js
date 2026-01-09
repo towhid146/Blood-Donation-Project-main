@@ -127,6 +127,13 @@ function renderNavbar(navbar, data) {
       <span id="response-badge" class="hidden absolute -top-2 -right-2 w-5 h-5 bg-green-500 text-white text-xs rounded-full flex items-center justify-center"></span>
     </a>`;
 
+    // Admin link (only for admins)
+    if (data.isAdmin) {
+      navbarHtml += `<a href="/admin" class="${linkClass}">
+        <i class="fas fa-user-shield mr-1 text-purple-600"></i>Admin
+      </a>`;
+    }
+
     navbarHtml += `<a href="/profile" class="${linkClass}">
       <i class="fas fa-user-circle mr-1"></i>${data.username}
     </a>`;
@@ -177,6 +184,14 @@ function renderMobileMenu(data) {
     </a>`;
     menuHtml += `<a href="/donorTablePage" class="${linkClass}">Donor Table</a>`;
     menuHtml += `<a href="/aboutUsPage" class="${linkClass}">About Us</a>`;
+
+    // Admin link (only for admins)
+    if (data.isAdmin) {
+      menuHtml += `<a href="/admin" class="${linkClass}">
+        <i class="fas fa-user-shield mr-2 text-purple-600"></i>Admin Panel
+      </a>`;
+    }
+
     menuHtml += `<a href="/profile" class="${linkClass}">
       <i class="fas fa-user-circle mr-2"></i>Profile (${data.username})
     </a>`;
