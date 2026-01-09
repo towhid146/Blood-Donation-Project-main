@@ -251,30 +251,36 @@ async function loadNotificationCounts() {
   try {
     if (typeof api !== "undefined" && api.getNotificationCount) {
       const data = await api.getNotificationCount();
-      
+
       // Update desktop badges
       const requestBadge = document.getElementById("request-badge");
       const responseBadge = document.getElementById("response-badge");
-      
+
       if (requestBadge && data.newRequestsCount > 0) {
-        requestBadge.textContent = data.newRequestsCount > 9 ? "9+" : data.newRequestsCount;
+        requestBadge.textContent =
+          data.newRequestsCount > 9 ? "9+" : data.newRequestsCount;
         requestBadge.classList.remove("hidden");
       }
-      
+
       if (responseBadge && data.unseenResponsesCount > 0) {
-        responseBadge.textContent = data.unseenResponsesCount > 9 ? "9+" : data.unseenResponsesCount;
+        responseBadge.textContent =
+          data.unseenResponsesCount > 9 ? "9+" : data.unseenResponsesCount;
         responseBadge.classList.remove("hidden");
       }
-      
+
       // Update mobile badges
-      const mobileRequestBadge = document.getElementById("mobile-request-badge");
-      const mobileResponseBadge = document.getElementById("mobile-response-badge");
-      
+      const mobileRequestBadge = document.getElementById(
+        "mobile-request-badge"
+      );
+      const mobileResponseBadge = document.getElementById(
+        "mobile-response-badge"
+      );
+
       if (mobileRequestBadge && data.newRequestsCount > 0) {
         mobileRequestBadge.textContent = data.newRequestsCount;
         mobileRequestBadge.classList.remove("hidden");
       }
-      
+
       if (mobileResponseBadge && data.unseenResponsesCount > 0) {
         mobileResponseBadge.textContent = data.unseenResponsesCount;
         mobileResponseBadge.classList.remove("hidden");
