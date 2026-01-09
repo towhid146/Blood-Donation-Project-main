@@ -181,16 +181,24 @@
                       name="password"
                       type="password"
                       required
-                      class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                      class="w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
                       placeholder="Enter your password"
                     />
+                    <button
+                      type="button"
+                      id="togglePassword"
+                      class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition"
+                    >
+                      <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
                   </div>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <label class="flex items-center">
+                  <label class="flex items-center cursor-pointer">
                     <input
                       type="checkbox"
+                      id="rememberMe"
                       class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
                     />
                     <span class="ml-2 text-sm text-gray-600">Remember me</span>
@@ -249,6 +257,48 @@
     <script>
       document.getElementById("menu-btn").addEventListener("click", () => {
         document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+
+      // Show/Hide Password Toggle
+      const togglePassword = document.getElementById("togglePassword");
+      const passwordInput = document.getElementById("password");
+      const eyeIcon = document.getElementById("eyeIcon");
+
+      togglePassword.addEventListener("click", function () {
+        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+        passwordInput.setAttribute("type", type);
+        
+        // Toggle eye icon
+        if (type === "text") {
+          eyeIcon.classList.remove("fa-eye");
+          eyeIcon.classList.add("fa-eye-slash");
+        } else {
+          eyeIcon.classList.remove("fa-eye-slash");
+          eyeIcon.classList.add("fa-eye");
+        }
+      });
+
+      // Remember Me Functionality
+      const usernameInput = document.getElementById("username");
+      const rememberMeCheckbox = document.getElementById("rememberMe");
+
+      // Load saved username if exists
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedUsername = localStorage.getItem("rememberedUsername");
+        if (savedUsername) {
+          usernameInput.value = savedUsername;
+          rememberMeCheckbox.checked = true;
+        }
+      });
+
+      // Save username on form submit if remember me is checked
+      const loginForm = document.getElementById("loginForm");
+      loginForm.addEventListener("submit", function () {
+        if (rememberMeCheckbox.checked) {
+          localStorage.setItem("rememberedUsername", usernameInput.value);
+        } else {
+          localStorage.removeItem("rememberedUsername");
+        }
       });
     </script>
   </body>
